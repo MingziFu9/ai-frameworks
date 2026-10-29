@@ -1,0 +1,86 @@
+# 第 1 章教案底稿，由 python tools/make_lesson_plan.py draft 生成。
+# 改好“【待填】”的地方，删减或补充其他内容后运行 build。字段说明见 lesson-plans/README.md
+chapter: 1
+online: 3
+offline: 3
+methods:
+- 讲授法
+- 案例教学法
+- 演示法
+- 线上自主学习
+- 实验教学法
+objectives:
+  knowledge:
+  - 说出……
+  - 解释……
+  skill:
+  - 计算 / 实现……
+  - 比较 / 选择……
+  quality:
+  - 【待填】职业素养、科学态度或科技伦理方面的目标，1–2 条
+key_points:
+- 示例小节
+difficulties:
+- point: 【待填】学生最容易卡住的 1–2 个难点
+  solution: 【待填】突破难点的办法，如动画演示、手算例子
+process:
+- phase: 课前（线上）
+  steps:
+  - name: 自主预习
+    minutes: 54
+    content: 阅读网页教材第 1 章 示例章的情景导入和第一节，操作交互动画“示例动画：点击计数器”
+    teacher: 在学习平台发布预习任务和预习问题
+    student: 阅读教材、观看课件，在讨论区提出疑问
+    intent: 带着问题进课堂
+- phase: 课中（线下面授 / 直播）
+  steps:
+  - name: 情景导入
+    minutes: 10
+    content: 情景导入：用一个学生熟悉的工作或生活场景开头（两三段），提出本章要解决的问题，并点出本章的核心概念，例如示例术语。……
+    teacher: 讲述情景，提出本章要解决的问题
+    student: 思考并回答问题，说出自己的经验
+    intent: 联系工作和生活场景，激发学习兴趣
+  - name: 讲授与演示
+    minutes: 55
+    content: 1.1 示例小节：正文写法、交互动画、图示
+    teacher: 讲解要点，结合例子和“算一算”演示；用交互动画“示例动画：点击计数器”课堂演示
+    student: 听讲、跟着计算、操作动画并回答提问
+    intent: 【待填】
+  - name: 拓展
+    minutes: 10
+    content: 1.2 前沿视窗
+    teacher: 讲解要点，结合例子和“算一算”演示
+    student: 听讲、跟着计算、记录要点
+    intent: 【待填】
+  - name: 实验
+    minutes: 45
+    content: 实验 1-1 示例实验
+    teacher: 演示关键步骤，巡视指导，收集常见错误
+    student: 按步骤完成实验，填写记录表
+    intent: ……；……
+  - name: 课堂练习
+    minutes: 10
+    content: 课后练习中的单选、判断题（在线作答，共 3 题，选做）
+    teacher: 组织学生在网页上作答，讲评错误率高的题
+    student: 在线作答，查看解析
+    intent: 即时检验学习效果
+  - name: 小结
+    minutes: 5
+    content: 用本章知识导图回顾要点，预告下一章
+    teacher: 带领学生梳理知识导图
+    student: 复述本章要点
+    intent: 形成知识结构
+- phase: 课后（线上）
+  steps:
+  - name: 课后巩固
+    minutes: 81
+    content: 完成本章课后练习（在线作答 3 题，简答 / 实操 2 题），提交实验报告
+    teacher: 批改作业和实验报告，在讨论区答疑
+    student: 完成练习，错题点“回看”复习对应小节
+    intent: 巩固知识，形成技能
+homework:
+- 简答题：简述本章示例实验的步骤。
+- 实操题：修改实验 1-1 的数据，使准确率变为 100%，写出修改后的代码和运行结果。
+- 实验报告：实验 1-1
+assessment: 课堂练习正确率、课后作业和实验报告计入平时成绩
+reflection: ''

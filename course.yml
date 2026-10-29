@@ -1,0 +1,44 @@
+# ============================================================
+# 课程配置：全书唯一需要手改的配置文件
+# 改完后运行  python tools/course.py sync  ，会自动更新：
+#   mkdocs.yml 的站点名和导航、首页课程信息与目录、缺少的章节骨架、
+#   实验目录、术语表的章节小节、学习图谱的章节列表、附录编号
+# 课件（tools/make_slides.py）、教案（tools/make_lesson_plan.py）、Word/PDF 版（tools/export_docx.py）
+# 也从这里读取课程名、学时等信息
+# ============================================================
+
+title: 课程名称                      # 书名，例如：机器学习
+description: 面向成人教育人工智能技术应用专业（专科）的《课程名称》教材，每章配套动手实验
+audience: 成人教育（继续教育）人工智能技术应用专业专科学生，多为在职学习者
+github_user: MingziFu9                # 网址 https://<github_user>.github.io/<repo>/
+repo: ai-textbook-template            # GitHub 仓库名（用模板新建后改成本课的，如 ml-textbook）
+
+credits: 4                            # 学分
+hours: {theory: 60, lab: 12}          # 学时：理论 + 实验
+semester: 3                           # 开课学期
+exam: 闭卷                            # 期末考核方式
+labs_per_chapter: 3                   # 每章实验数；0 表示没有实验
+lab_section: 本章实验                 # 实验部分的二级标题；导论用“在线体验”
+lab_word: 实验                        # 每个实验的三级标题前缀（### 实验 N-M）；导论用“体验”
+frontier_title: 前沿视窗              # 每章“前沿”小节的名称，导论用“身边的 AI”
+certificates:                         # 对应的职业证书；没有证书的课程写成 certificates: []，导航里就不显示“证书考点对照”页
+  - name: 证书名称（级别）
+    issuer: 发证机构，标准或考纲名称（年份）
+
+# 章节：dir 是 docs/chapters/ 下的文件夹名（两位章号开头），short 用于学习图谱等窄处
+# theory / lab 是本章学时；labs 可单独覆盖本章实验数
+chapters:
+  - {dir: 01-sample, title: 示例章, short: 示例章, theory: 5, lab: 1}
+
+# 附录：docs/appendix/ 下的文件，按顺序自动编号为 A、B、C……（术语表固定为 glossary.md）
+appendices:
+  - {file: a-python.md, title: Python 速查}
+  - {file: b-libraries.md, title: 工具库速查}
+  - {file: c-environment.md, title: 实验环境与数据说明}
+  - {file: glossary.md, title: 术语表}
+
+# 教案默认设置（每章可在 lesson-plans/chNN.yml 里覆盖）
+lesson_plan:
+  online_ratio: 0.5                   # 线上学时占比（开放大学以线上为主，按实际改）
+  teacher: ""                         # 授课教师，留空则教案上留出填写位置
+  school: ""                          # 学校名称，留空则不显示

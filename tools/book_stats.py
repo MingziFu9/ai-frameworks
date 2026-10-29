@@ -6,6 +6,7 @@ import re
 from pathlib import Path
 
 import glossary_links as g
+from common import course
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -22,7 +23,7 @@ def chapter_stats(path, num, glossary):
     return {
         "num": num, "dir": path.parent.name,
         "words": len(re.findall(r"[一-鿿]", body)),
-        "labs": len(re.findall(r"^### 实验 \d+-\d+", s, re.M)),
+        "labs": len(re.findall(r"^### (?:实验|体验) \d+-\d+", s, re.M)),   # 导论用“体验 N-M”
         "exercises": exercises,
         "quiz": len(re.findall(r'class="quiz[ "]', tail)),
         "terms": len(glossary.get(num, [])),
@@ -42,7 +43,8 @@ def main():
     graph = (DOCS / "learning-graph/data.js").read_text(encoding="utf-8")
     concepts = graph.count('"id":')
     faq = (DOCS / "faq/index.md").read_text(encoding="utf-8").count('??? question')
-    lines = [START, "", "| 章 | 正文字数 | 实验 | 课后练习<br>（可在线作答） | 术语 | 参考文献 | 交互动画 |", "|---|---|---|---|---|---|---|"]
+    word = course().get("lab_word", "实验")
+    lines = [START, "", f"| 章 | 正文字数 | {word} | 课后练习<br>（可在线作答） | 术语 | 参考文献 | 交互动画 |", "|---|---|---|---|---|---|---|"]
     for r in rows:
         lines.append(f"| [第 {r['num']} 章](chapters/{r['dir']}/index.md) | {wan(r['words'])} | {r['labs']} | {r['exercises']}（{r['quiz']}） | {r['terms']} | {r['refs']} | {r['sims']} |")
     lines.append(f"| **合计** | **{wan(total['words'])}** | **{total['labs']}** | **{total['exercises']}（{total['quiz']}）** | **{total['terms']}** | **{total['refs']}** | **{total['sims']}** |")
@@ -55,7 +57,7 @@ def main():
     else:
         s = s.replace("## 目录与实验", "## 全书概览\n\n" + block + "\n\n## 目录与实验", 1)
     index.write_text(s, encoding="utf-8")
-    print(f"全书 {wan(total['words'])}字，{total['labs']} 个实验，{total['exercises']} 道练习，{total['sims']} 个动画")
+    print(f"全书 {wan(total['words'])}字，{total['labs']} 个{word}，{total['exercises']} 道练习，{total['sims']} 个动画")
 
 
 if __name__ == "__main__":

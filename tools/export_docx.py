@@ -2,13 +2,14 @@
 
 用法（在仓库根目录运行，需要先安装 pandoc 3.x）：
 
-    python tools/export_docx.py              # 全书，按 mkdocs.yml 的 nav 顺序，输出 build/教材.docx
+    python tools/export_docx.py              # 全书，按 mkdocs.yml 的 nav 顺序，输出 build/<书名>.docx
     python tools/export_docx.py 01-sample    # 只导出一章，输出 build/01-sample.docx
     python tools/export_docx.py --pdf        # 同时用 LibreOffice 转出 PDF（需要安装 LibreOffice）
 
-网页特有的元素按下面的办法转换：交互动画换成“请在网页版查看”的提示；Mermaid 图换成提示
-（需要图片时，在网页上截图后手动插入）；提示框变成带粗体标题的引用块；在线答题的选项照常列出，
+网页特有的元素按下面的办法转换：交互动画换成动画截图、二维码和网址（扫码即可在手机上操作）；
+Mermaid 图换成渲染好的图片；提示框变成带粗体标题的引用块；在线答题的选项照常列出，
 答案与解析保留在题目下方；术语和站内链接只保留文字。
+截图和 Mermaid 图片由 npm run figures（tools/render_figures.mjs）生成，没有生成时退回“请在网页版查看”的提示。
 """
 import re
 import subprocess
@@ -16,6 +17,8 @@ import sys
 from pathlib import Path
 
 import yaml
+
+from common import course, mermaid_png, qr_png, sim_png, site_url
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -46,9 +49,26 @@ def nav_pages():
     return [p for p in pages if p == "course-description.md" or p.startswith(("chapters/", "appendix/"))]
 
 
+def mermaid_figure(m):
+    png = mermaid_png(m.group(1))
+    return f"![]({png.as_posix()}){{WIDTH=90%}}" if png else "> 【图示】本图为交互图，请在网页版查看。"
+
+
+def sim_figure(m):
+    name, title = m.group(1), m.group(2)
+    url = f"{site_url(course())}sims/{name}/main.html"
+    png, qr = sim_png(name), qr_png(url)
+    out = [f"![]({png.as_posix()}){{WIDTH=85%}}", ""] if png else []   # alt 留空：后面去链接的替换会吃掉带文字的图片
+    if qr:
+        out += [f"![]({qr.as_posix()}){{WIDTH=2.5cm}}", ""]
+    out.append(f"> 【交互动画】{title}：扫描二维码或打开 <{url}> 动手操作。")
+    return "\n".join(out)
+
+
 def convert(md):
     md = re.sub(r"\A---\n.*?\n---\n", "", md, flags=re.S)
-    md = re.sub(r"```mermaid\n.*?```", "> 【图示】本图为交互图，请在网页版查看。", md, flags=re.S)
+    md = re.sub(r"```mermaid\n(.*?)```", mermaid_figure, md, flags=re.S)
+    md = re.sub(r'<iframe[^>]*src="[^"]*sims/([\w-]+)/main\.html"[^>]*title="([^"]*)"[^>]*></iframe>', sim_figure, md)
     md = re.sub(r'<iframe[^>]*title="([^"]*)"[^>]*></iframe>', r"> 【交互动画】\1：请在网页版查看。", md)
     md = re.sub(r"^.*\{ \.sim-caption \}\n", "", md, flags=re.M)
     md = re.sub(r'<sup class="cite">\[\[(\d+)\]\]\([^)]*\)</sup>', r"^[\1]^", md)
@@ -72,7 +92,7 @@ def convert(md):
                 break
             out.append(("> " + lines[i][4:]).rstrip())
             i += 1
-    return "\n".join(out)
+    return "\n".join(out).replace("{WIDTH=", "{width=")   # 图片宽度用大写写入，躲过上面去掉属性的替换
 
 
 def main():
@@ -81,7 +101,7 @@ def main():
     if args:
         pages, name = [f"chapters/{args[0]}/index.md"], args[0]
     else:
-        pages, name = nav_pages(), "教材"
+        pages, name = nav_pages(), course()["title"]
     title = yaml.load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"), Loader=_Loader)["site_name"]
     body = "\n\n".join(convert((DOCS / p).read_text(encoding="utf-8")) for p in pages)
     tmp = OUT / f"{name}.md"

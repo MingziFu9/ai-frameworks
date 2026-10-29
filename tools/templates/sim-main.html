@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><<title>></title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+  /* 只写本动画特有的样式；按钮、表格、条形图等通用样式在 ../common/sim.css */
+</style>
+</head>
+<body>
+<h1><<title>>：一句话说明能看到什么</h1>
+<div class="sub">操作提示：拖动滑块，观察……的变化。数据来源：……（实测 / 编者构造）。</div>
+
+<div class="row">
+  <span>参数 x</span>
+  <input type="range" id="x" min="0" max="1" step="0.01" value="0.5" aria-label="参数 x">
+  <b id="xv"></b>
+</div>
+<div class="row ex"><span class="lbl">试一试：</span><button data-x="0.2">x = 0.2</button><button data-x="0.8">x = 0.8</button></div>
+
+<div class="box">
+  <h2>结果</h2>
+  <div id="bars"></div>
+  <div class="msg" id="msg"></div>
+</div>
+<div class="note">说明：页面上的数值与教材第 <<chapter>> 章的表格一致。</div>
+
+<script>
+(function () {
+  var x = document.getElementById("x");
+  function render() {
+    var v = +x.value;
+    document.getElementById("xv").textContent = v.toFixed(2);
+    var items = [["结果 A", v], ["结果 B", 1 - v]];
+    document.getElementById("bars").innerHTML = items.map(function (it) {
+      return '<div class="barrow"><span>' + it[0] + '</span><div class="bar" style="width:' + (it[1] * 100) + '%"></div><span class="v">' + it[1].toFixed(2) + "</span></div>";
+    }).join("");
+    document.getElementById("msg").textContent = v > 0.5 ? "A 占上风" : "B 占上风";
+  }
+  x.oninput = render;
+  document.querySelectorAll("[data-x]").forEach(function (b) { b.onclick = function () { x.value = b.dataset.x; render(); }; });
+  render();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>

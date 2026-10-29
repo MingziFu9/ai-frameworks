@@ -1,0 +1,52 @@
+name: 导出课件、教案和 Word/PDF
+# 手动运行：仓库 Actions → 导出课件、教案和 Word/PDF → Run workflow，几分钟后在本次运行页面底部的 Artifacts 下载。
+# 推送 v 开头的标签（如 v1.0）时也会运行，并把文件附到同名的 Release 上。
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: 安装中文字体、pandoc 和 LibreOffice
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y fonts-noto-cjk pandoc libreoffice-writer
+      - run: pip install -r requirements-tools.txt
+      - name: 渲染 Mermaid 图和动画截图
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm run figures
+      - name: 生成课件、教案、Word/PDF 版
+        run: |
+          python tools/make_slides.py build all
+          python tools/make_lesson_plan.py build all
+          python tools/export_docx.py --pdf
+      - uses: actions/upload-artifact@v4
+        with:
+          name: 课件教案与Word-PDF版
+          path: |
+            build/课件/
+            build/教案/
+            build/*.docx
+            build/*.pdf
+      - name: 附到 Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/课件/*.pptx
+            build/教案/*.docx
+            build/*.docx
+            build/*.pdf

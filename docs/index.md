@@ -2,8 +2,14 @@
 
 **面向成人教育人工智能技术应用专业（专科）的《课程名称》教材**
 
+<!-- 书名、课程信息框和“目录与实验”表由 python tools/course.py sync 根据 course.yml 生成；全书概览表由 python tools/book_stats.py 生成 -->
+
+<!-- course:start -->
 !!! abstract "课程信息"
-    学分 · 学时（理论 + 实验）· 章数 · 实验数
+    4 学分 · 72 学时（理论 60 学时 + 实验 12 学时） · 第 3 学期 · 1 章 · 3 个实验 · 期末闭卷
+
+    对应证书：证书名称（级别）
+<!-- course:end -->
 
 ## 这本书讲什么
 
@@ -32,9 +38,13 @@
 
 ## 目录与实验
 
+<!-- toc:start -->
 | 章节 | 实验 |
 |---|---|
-| [第 1 章 示例章](chapters/01-sample/index.md) | 实验 1-1 ★ 示例实验<br>实验 1-2 ★ ……<br>实验 1-3 ☆ …… |
+| [第 1 章 示例章](chapters/01-sample/index.md) | 实验 1-1 ★ 示例实验 |
+
+附录：[A Python 速查](appendix/a-python.md) · [B 工具库速查](appendix/b-libraries.md) · [C 实验环境与数据说明](appendix/c-environment.md) · [D 术语表](appendix/glossary.md)
+<!-- toc:end -->
 
 ## 配套资源
 

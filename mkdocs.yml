@@ -1,6 +1,8 @@
-# 新书只需改动：site_name、site_description，以及 nav（每写完一章、一个动画就加一行）
+# 站点名、描述、网址和 nav 由 python tools/course.py sync 根据 course.yml 生成，请改 course.yml，不要手改这几项
 site_name: 课程名称
 site_description: 面向成人教育人工智能技术应用专业（专科）的《课程名称》教材，每章配套动手实验
+site_url: https://mingzifu9.github.io/ai-textbook-template/
+repo_url: https://github.com/MingziFu9/ai-textbook-template
 docs_dir: docs
 theme:
   name: material
@@ -35,7 +37,7 @@ extra_javascript:
 nav:
   - 首页: index.md
   - 课程描述: course-description.md
-  - "第 1 章 示例章（写正文时替换）": chapters/01-sample/index.md
+  - "第 1 章 示例章": chapters/01-sample/index.md
   - 交互动画:
     - sims/index.md
     - "示例动画：点击计数器": sims/example-counter/index.md
