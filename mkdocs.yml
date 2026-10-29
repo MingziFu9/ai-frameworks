@@ -1,0 +1,49 @@
+# 新书只需改动：site_name、site_description，以及 nav（每写完一章、一个动画就加一行）
+site_name: 课程名称
+site_description: 面向成人教育人工智能技术应用专业（专科）的《课程名称》教材，每章配套动手实验
+docs_dir: docs
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - abbr
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - tables
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+extra_css:
+  - css/extra.css
+extra_javascript:
+  - javascripts/mathjax.js
+  - javascripts/book.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js
+nav:
+  - 首页: index.md
+  - 课程描述: course-description.md
+  - "第 1 章 示例章（写正文时替换）": chapters/01-sample/index.md
+  - 交互动画:
+    - sims/index.md
+    - "示例动画：点击计数器": sims/example-counter/index.md
+  - 学习图谱: learning-graph/index.md
+  - 常见问题: faq/index.md
+  - 证书考点对照: certificate.md
+  - 附录:
+    - "附录 A Python 速查": appendix/a-python.md
+    - "附录 B 工具库速查": appendix/b-libraries.md
+    - "附录 C 实验环境与数据说明": appendix/c-environment.md
+    - "附录 D 术语表": appendix/glossary.md

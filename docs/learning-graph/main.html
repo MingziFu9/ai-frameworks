@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学习图谱</title>
+<link rel="stylesheet" href="../sims/common/sim.css">
+<style>
+  .wrap { position:relative; }
+  svg.edges { position:absolute; left:0; top:0; pointer-events:none; overflow:visible; }
+  .lane { display:grid; grid-template-columns:7.5em 1fr; gap:8px; padding:6px 0; border-top:1px solid #eceff1; }
+  .lane .h { font-size:12px; color:var(--muted); line-height:1.4; }
+  .lane .h b { display:block; color:var(--ink); font-size:13px; }
+  .chips { display:flex; flex-wrap:wrap; gap:5px; }
+  .chip { position:relative; z-index:1; font-size:12.5px; padding:2px 8px; border-radius:12px; border:1.5px solid var(--c); background:#fff; cursor:pointer; color:var(--ink); transition:opacity .2s, background .2s; }
+  .chip:hover { background:var(--cb); }
+  .dim .chip { opacity:.22; }
+  .dim .chip.anc, .dim .chip.desc, .dim .chip.sel { opacity:1; }
+  .chip.anc { background:#fff3e0; border-color:#ef6c00; }
+  .chip.desc { background:#e3f2fd; border-color:#1e88e5; }
+  .chip.sel { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:bold; }
+  .chip.hit { box-shadow:0 0 0 3px #ffeb3b; }
+  .legend { display:flex; flex-wrap:wrap; gap:4px; font-size:12px; }
+  .legend span { padding:1px 8px; border-radius:10px; border:1.5px solid var(--c); cursor:pointer; user-select:none; }
+  .legend span.off { opacity:.3; }
+  .panel { position:sticky; top:0; z-index:2; background:#fff; border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin:8px 0; font-size:13.5px; max-height:45vh; overflow:auto; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+  .panel h2 { font-size:15px; margin:0 0 4px; }
+  .panel a { color:var(--accent); }
+  .path { display:flex; flex-wrap:wrap; gap:3px; align-items:center; margin-top:3px; }
+  .path span { font-size:12px; padding:0 6px; border-radius:10px; background:#fff3e0; cursor:pointer; }
+  .path span.d { background:#e3f2fd; }
+  .path i { color:var(--muted); font-style:normal; font-size:11px; }
+  .stats { font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>学习图谱：每个概念要先学什么、学完能学什么</h1>
+<div class="sub">全书核心概念按章排列，颜色表示类别。点一个概念：<span style="background:#fff3e0;padding:0 4px;border-radius:3px">橙色</span>是要先掌握的概念（先修），<span style="background:#e3f2fd;padding:0 4px;border-radius:3px">蓝色</span>是以它为基础的后续概念。再点一次取消选择。</div>
+<div class="row"><input type="text" id="q" placeholder="搜索概念，输入概念名称或定义里的词"><span class="stats" id="stats"></span></div>
+<div class="legend" id="legend"></div>
+<div class="panel" id="panel"></div>
+<div class="wrap" id="wrap"><svg class="edges" id="edges"></svg><div id="lanes"></div></div>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  var COLORS = ["#607d8b","#8d6e63","#7b1fa2","#00897b","#f9a825","#e53935","#3949ab","#d81b60","#43a047","#546e7a"];
+  var BG = ["#eceff1","#efebe9","#f3e5f5","#e0f2f1","#fff8e1","#ffebee","#e8eaf6","#fce4ec","#e8f5e9","#eceff1"];
+  var byId = {}, pre = {}, post = {}, sel = null, hidden = {};
+  NODES.forEach(function (n) { byId[n.id] = n; pre[n.id] = []; post[n.id] = []; });
+  EDGES.forEach(function (e) { pre[e[1]].push(e[0]); post[e[0]].push(e[1]); });
+  function closure(id, m) { var out = {}, st = [id]; while (st.length) { var x = st.pop(); m[x].forEach(function (y) { if (!out[y]) { out[y] = 1; st.push(y); } }); } return out; }
+  // 在全书中的“深度”：最长先修链的长度，用于排序
+  var depth = {}; function dep(id) { if (depth[id] != null) return depth[id]; depth[id] = 0; var d = 0; pre[id].forEach(function (p) { d = Math.max(d, dep(p) + 1); }); return depth[id] = d; }
+  NODES.forEach(function (n) { dep(n.id); });
+  document.getElementById("stats").textContent = NODES.length + " 个概念，" + EDGES.length + " 条先修关系";
+
+  document.getElementById("legend").innerHTML = CATS.map(function (c, i) { return '<span data-c="' + i + '" style="--c:' + COLORS[i] + ";background:" + BG[i] + '">' + c + "</span>"; }).join("");
+  document.querySelectorAll("#legend span").forEach(function (s) { s.onclick = function () { var i = +s.dataset.c; hidden[i] = !hidden[i]; s.classList.toggle("off", hidden[i]); render(); }; });
+
+  var lanes = document.getElementById("lanes");
+  for (var ch = 1; ch < CHAPTERS.length; ch++) {
+    var ns = NODES.filter(function (n) { return n.ch === ch; }).sort(function (a, b) { return depth[a.id] - depth[b.id]; });
+    var d = document.createElement("div"); d.className = "lane";
+    d.innerHTML = '<div class="h"><b>第 ' + ch + " 章</b>" + CHAPTERS[ch] + '</div><div class="chips">' + ns.map(function (n) {
+      return '<button class="chip" data-id="' + n.id + '" style="--c:' + COLORS[n.cat] + ";--cb:" + BG[n.cat] + '">' + n.id + "</button>";
+    }).join("") + "</div>";
+    lanes.appendChild(d);
+  }
+  var chips = {}; document.querySelectorAll(".chip").forEach(function (c) { chips[c.dataset.id] = c; c.onclick = function () { sel = sel === c.dataset.id ? null : c.dataset.id; render(); }; });
+
+  function link(n) { return '<a href="../appendix/glossary/index.html#' + n.a + '" target="_top">术语表</a> · <a href="../chapters/' + CHDIRS[n.ch] + '/index.html" target="_top">第 ' + n.ch + " 章</a>"; }
+  function seq(set, cls) {
+    var ids = Object.keys(set).sort(function (a, b) { return byId[a].ch - byId[b].ch || depth[a] - depth[b]; }), out = "", last = 0;
+    ids.forEach(function (id) { var c = byId[id].ch; if (c !== last) { out += "<i>第 " + c + " 章</i>"; last = c; } out += '<span class="' + cls + '" data-go="' + id + '">' + id + "</span>"; });
+    return out || "<i>（无）</i>";
+  }
+  function render() {
+    var A = sel ? closure(sel, pre) : {}, D = sel ? closure(sel, post) : {};
+    document.getElementById("wrap").classList.toggle("dim", !!sel);
+    Object.keys(chips).forEach(function (id) {
+      var c = chips[id], n = byId[id];
+      c.style.display = hidden[n.cat] ? "none" : "";
+      c.classList.toggle("sel", id === sel); c.classList.toggle("anc", !!A[id]); c.classList.toggle("desc", !!D[id]);
+    });
+    var p = document.getElementById("panel");
+    if (!sel) { p.innerHTML = "<b>使用方法</b>：点任意一个概念，这里会列出它的定义、要先学的概念（按章节顺序排好，就是一条学习路径）和学完可以接着学的概念。搜索框可以快速定位，点图例可以隐藏某一类概念。"; }
+    else {
+      var n = byId[sel];
+      p.innerHTML = "<h2>" + n.id + '　<span style="font-size:12px;font-weight:normal;color:' + COLORS[n.cat] + '">' + CATS[n.cat] + "</span></h2>" + n.d + "　" + link(n) +
+        "<div style='margin-top:6px'><b>直接先修</b>：" + (pre[sel].join("、") || "无，这是全书的起点之一") + "</div>" +
+        "<div><b>学习路径</b>（全部先修概念，共 " + Object.keys(A).length + " 个）：</div><div class='path'>" + seq(A, "") + "</div>" +
+        "<div style='margin-top:4px'><b>学完可以接着学</b>（共 " + Object.keys(D).length + " 个）：</div><div class='path'>" + seq(D, "d") + "</div>";
+      p.querySelectorAll("[data-go]").forEach(function (s) { s.onclick = function () { sel = s.dataset.go; render(); chips[sel].scrollIntoView({ block:"nearest" }); }; });
+    }
+    drawEdges(A, D);
+  }
+  function drawEdges(A, D) {
+    var svg = document.getElementById("edges"), wrap = document.getElementById("wrap"), r0 = wrap.getBoundingClientRect(), s = "";
+    svg.setAttribute("width", wrap.offsetWidth); svg.setAttribute("height", wrap.offsetHeight);
+    if (sel) {
+      // 只画和选中概念直接相连的边，其余先修 / 后续概念用颜色标出，避免线太多看不清
+      EDGES.forEach(function (e) {
+        if (e[1] !== sel && e[0] !== sel) return;
+        var a = chips[e[0]], b = chips[e[1]]; if (a.style.display === "none" || b.style.display === "none") return;
+        var ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect(), col = e[0] === sel ? "#1e88e5" : "#ef6c00", m = e[0] === sel ? "d" : "a";
+        var x1 = ra.left + ra.width / 2 - r0.left, x2 = rb.left + rb.width / 2 - r0.left, y1, y2, c1, c2;
+        if (Math.abs(ra.top - rb.top) < 5) { y1 = ra.top - r0.top; y2 = rb.top - r0.top; c1 = c2 = y1 - 22; }
+        else if (ra.top < rb.top) { y1 = ra.bottom - r0.top; y2 = rb.top - r0.top; c1 = c2 = (y1 + y2) / 2; }
+        else { y1 = ra.top - r0.top; y2 = rb.bottom - r0.top; c1 = c2 = (y1 + y2) / 2; }
+        s += '<path d="M' + x1 + "," + y1 + " C" + x1 + "," + c1 + " " + x2 + "," + c2 + " " + x2 + "," + y2 + '" fill="none" stroke="' + col + '" stroke-width="1.6" marker-end="url(#ar' + m + ')"/>';
+      });
+    }
+    svg.innerHTML = '<defs><marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#ef6c00"/></marker><marker id="ard" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10z" fill="#1e88e5"/></marker></defs>' + s;
+  }
+  document.getElementById("q").oninput = function (e) {
+    var v = e.target.value.trim().toLowerCase(), first = null;
+    Object.keys(chips).forEach(function (id) { var h = v && (id.toLowerCase().indexOf(v) >= 0 || byId[id].d.toLowerCase().indexOf(v) >= 0); chips[id].classList.toggle("hit", !!h); if (h && !first) first = id; });
+    if (first) chips[first].scrollIntoView({ block:"nearest" });
+  };
+  document.getElementById("q").onkeydown = function (e) { if (e.key === "Enter") { var h = document.querySelector(".chip.hit"); if (h) { sel = h.dataset.id; render(); } } };
+  window.addEventListener("resize", render);
+  // 支持从网址打开时直接选中，例如 main.html#BM25
+  var hash = decodeURIComponent(location.hash.slice(1)); if (byId[hash]) sel = hash;
+  render();
+})();
+</script>
+<script src="../sims/common/sim.js"></script>
+</body>
+</html>

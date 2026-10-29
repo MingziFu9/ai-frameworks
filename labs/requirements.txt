@@ -1,0 +1,8 @@
+# 《课程名称》实验环境（写明教材编写时实测通过的版本，Python 3.11）
+# 安装：pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 只列学生实验真正用到的库，版本号必须是编者实际运行过的；需要 GPU 的库单独写在下面并注明
+pandas
+numpy
+matplotlib
+scikit-learn
+jupyter
