@@ -8,7 +8,7 @@ sync 会做这些事（只增不删，已写好的正文不会被覆盖）：
     1. mkdocs.yml：站点名、描述、网址、导航（nav: 之后的内容全部重新生成）
     2. 首页：书名、课程信息框、“目录与实验”表格
     3. 章节：course.yml 里有、但文件夹还不存在的章，按 tools/templates/chapter.md 生成骨架
-    4. 实验：每章一个 labs/chNN/ 文件夹（没有实验的课不建）
+    4. 实验：每章一个 labs/chNN/ 文件夹（没有实验学时的章不建）
     5. 术语表：每章一个“## 第 N 章”小节
     6. 学习图谱：data.js 里的章节名、文件夹列表
     7. 附录：按顺序编号为 A、B、C……（标题和“## A.1”这类小节号一起改）
@@ -71,7 +71,7 @@ def sync_chapters(c):
             (p.parent / "images").mkdir(exist_ok=True)
             p.write_text(render_chapter(ch, c), encoding="utf-8")
             print(f"  新建章节骨架 {p.relative_to(ROOT)}")
-        if ch["labs"]:
+        if ch["labs"] and ch["lab"]:     # 没有实验学时（如导论的在线体验）不建 labs 目录
             lab = ROOT / "labs" / f"ch{ch['num']:02d}"
             if not lab.exists():
                 lab.mkdir(parents=True)
@@ -132,6 +132,7 @@ def sync_mkdocs(c):
     nav += [f"  - {q(chapter_heading(ch))}: chapters/{ch['dir']}/index.md" for ch in c["chapters"]]
     nav += ["  - 交互动画:", "    - sims/index.md"] + [f"    - {q(x['title'])}: sims/{x['name']}/index.md" for x in sims()]
     nav += ["  - 学习图谱: learning-graph/index.md", "  - 常见问题: faq/index.md"]
+    nav += [f"  - {q(x['title'])}: {x['file']}" for x in c.get("extra_pages", [])]
     if c["certificates"] and (DOCS / "certificate.md").exists():
         nav.append("  - 证书考点对照: certificate.md")
     if c.get("appendices"):

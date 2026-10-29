@@ -26,9 +26,12 @@ certificates:                         # 对应的职业证书；没有证书的�
     issuer: 发证机构，标准或考纲名称（年份）
 
 # 章节：dir 是 docs/chapters/ 下的文件夹名（两位章号开头），short 用于学习图谱等窄处
-# theory / lab 是本章学时；labs 可单独覆盖本章实验数
+# theory / lab 是本章学时；labs 可单独覆盖本章实验数；offline 可指定本章线下学时（不写则按 online_ratio 分）
 chapters:
   - {dir: 01-sample, title: 示例章, short: 示例章, theory: 5, lab: 1}
+
+# 其他页面：追加在导航“常见问题”之后，如 extra_pages: [{file: mock-exam.md, title: 在线模拟卷}]
+extra_pages: []
 
 # 附录：docs/appendix/ 下的文件，按顺序自动编号为 A、B、C……（术语表固定为 glossary.md）
 appendices:

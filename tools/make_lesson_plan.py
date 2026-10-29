@@ -38,6 +38,8 @@ KNOW_VERBS = ("说出", "列举", "复述", "识别", "描述", "解释", "说�
 
 def split_hours(c, ch):
     total = ch["theory"] + ch["lab"]
+    if "offline" in ch:                 # 章节里写了本章线下学时，就按它分
+        return total - ch["offline"], ch["offline"]
     online = round(total * c["lesson_plan"].get("online_ratio", 0.5))
     return online, total - online
 

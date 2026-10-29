@@ -26,7 +26,7 @@
 1. 在 GitHub 上打开本仓库，点 **Use this template → Create a new repository**，仓库名用课程的英文短名，例如 `ml-textbook`。
 2. 新仓库的 **Settings → Pages → Source** 选 **GitHub Actions**。
 3. 按大纲填写 `course.yml`（书名、仓库名、学分学时、各章目录名和标题、证书），运行 `python tools/course.py sync`：`mkdocs.yml` 的站点名和导航、首页课程信息和目录、术语表各章小节、学习图谱章节列表都会更新，还没有的章节按统一体例生成骨架。以后改章名、加章节、加动画，都是改完再 sync 一次。
-4. 手动修改 `docs/index.md` 的简介、`docs/course-description.md`、`docs/certificate.md`；本 README 改写成本课的说明。写完第 1 章后删掉 `01-sample`、`docs/sims/example-counter/` 和 `slides/ch01.md`、`lesson-plans/ch01.yml` 里的示例内容。
+4. 手动修改 `docs/index.md` 的简介、`docs/course-description.md`、`docs/certificate.md`；本 README 改写成本课的说明。写完第 1 章后删掉 `01-sample`和 `docs/sims/example-counter/` 里的示例内容。课件和教案底稿用 `make_slides.py draft N`、`make_lesson_plan.py draft N` 生成，格式示范见模板包的 `示例输出/`。
 5. 推送到 `main`，几分钟后网页出现在 `https://<用户名>.github.io/<仓库名>/`。
 
 没有实验的课（如导论）：`course.yml` 里把 `lab_section` 改成“在线体验”、`lab_word` 改成“体验”、`frontier_title` 改成“身边的 AI”，章节骨架、首页目录和统计会跟着用这些叫法。
