@@ -77,8 +77,19 @@ def replace_between(text, start, end, block):
 
 # ---------- 读章节内容（课件、教案、导出共用） ----------
 
-def chapter_text(ch):
-    return front_matter(chapter_path(ch).read_text(encoding="utf-8"))[1]
+def chapter_text(ch, edition=None):
+    return select_edition(front_matter(chapter_path(ch).read_text(encoding="utf-8"))[1], edition)
+
+
+def edition_arg(argv):
+    """从命令行取 --edition keras|paddle；没写时返回 None（表示两版都生成）"""
+    for i, a in enumerate(argv):
+        if a.startswith("--edition"):
+            v = a.split("=", 1)[1] if "=" in a else argv[i + 1]
+            if v not in EDITIONS:
+                raise SystemExit(f"--edition 只能是 {' 或 '.join(EDITIONS)}")
+            return v
+    return None
 
 
 def plain(s):
@@ -201,3 +212,44 @@ def qr_png(url):
         p.parent.mkdir(parents=True, exist_ok=True)
         qrcode.make(url, border=1).save(p)
     return p
+
+
+# ---------- 两版代码：通用版 / 国产版 ----------
+
+EDITIONS = {"keras": "通用版", "paddle": "国产版"}     # 命令行参数 → 网页标签名
+EDITION_TOOLS = {"keras": "Keras 3（TensorFlow 后端）", "paddle": "飞桨 PaddlePaddle"}
+
+
+def select_edition(text, edition):
+    """把网页上的版本标签（=== "通用版" / === "国产版"）换成只有一个版本的正文。
+
+    edition 为 None 时原样返回；为 "keras" 或 "paddle" 时，保留对应标签里的内容（去掉一层缩进），
+    丢掉另一个版本的标签。其他名字的标签不处理。"""
+    if not edition:
+        return text
+    want = EDITIONS[edition]
+    lines, out, i = text.split("\n"), [], 0
+    tab = re.compile(r'^(\s*)=== "(%s)"\s*$' % "|".join(EDITIONS.values()))
+    while i < len(lines):
+        m = tab.match(lines[i])
+        if not m:
+            out.append(lines[i]); i += 1; continue
+        ind = m.group(1)
+        while i < len(lines):                       # 同一组里的各个标签
+            m = tab.match(lines[i])
+            if not m or m.group(1) != ind:
+                break
+            keep, i, body = m.group(2) == want, i + 1, []
+            while i < len(lines) and (not lines[i].strip() or lines[i].startswith(ind + "    ")):
+                body.append(lines[i]); i += 1
+            j = len(body)                            # 末尾空行留给组外
+            while j and not body[j - 1].strip():
+                j -= 1
+            if keep:
+                out += [l[:len(ind)] + l[len(ind) + 4:] if l.strip() else "" for l in body[:j]]
+            nxt = i
+            if nxt < len(lines) and tab.match(lines[nxt]) and tab.match(lines[nxt]).group(1) == ind:
+                continue
+            out += body[j:]
+            break
+    return "\n".join(out)

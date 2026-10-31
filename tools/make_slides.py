@@ -4,6 +4,8 @@
     python tools/make_slides.py draft 3         # 从第 3 章正文生成课件底稿 slides/ch03.md（已有则不覆盖，加 --force 覆盖）
     python tools/make_slides.py build 3         # 把 slides/ch03.md 排版成 build/课件/第03章 章名.pptx
     python tools/make_slides.py build all       # 全部章节
+    加 --edition keras（或 paddle）只生成通用版（国产版）；不写时两版各生成一份。
+    底稿里用和网页相同的 === "通用版" / === "国产版" 标签写两版不同的页面内容。
 
 流程：先 draft 生成底稿，再把底稿精简成“一页一个要点”（底稿是从正文机械摘出来的，不能直接用），
 最后 build。课件里的 Mermaid 图和动画截图来自 npm run figures（tools/render_figures.mjs），
@@ -20,7 +22,7 @@ from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
 from pptx.oxml.ns import qn
 from pptx.util import Emu, Inches, Pt
 
-from common import (BUILD, ROOT, admonition, chapter_by_num, chapter_heading, chapter_path, chapter_text, course,
+from common import (BUILD, EDITIONS, edition_arg, select_edition, ROOT, admonition, chapter_by_num, chapter_heading, chapter_path, chapter_text, course,
                     front_matter, headings, lab_list, list_items, mermaid_blocks, mermaid_png, parse_quizzes,
                     plain, qr_png, safe_name, section, sim_png, sims_in, site_url)
 
@@ -365,9 +367,9 @@ def placeholder(slide, x, y, w, h, text):
 
 
 class Deck:
-    def __init__(self, c, ch):
-        self.c, self.ch = c, ch
-        self.text = chapter_text(ch)
+    def __init__(self, c, ch, edition=None):
+        self.c, self.ch, self.edition = c, ch, edition
+        self.text = chapter_text(ch, edition)
         self.mermaids = mermaid_blocks(self.text)
         self.quizzes = parse_quizzes(self.text)
         self.prs = Presentation()
@@ -406,7 +408,7 @@ class Deck:
         h = self.ch
         info = f"理论 {h['theory']} 学时" + (f" · 实验 {h['lab']} 学时" if h["lab"] else "")
         tf = box(s, MARGIN, Inches(4.5), W - 2 * MARGIN, Inches(1.2))
-        add_rich(tf.paragraphs[0], f"《{self.c['title']}》", 22, "FFFFFF")
+        add_rich(tf.paragraphs[0], f"《{self.c['title']}》" + (f"（{EDITIONS[self.edition]}）" if self.edition else ""), 22, "FFFFFF")
         add_rich(tf.add_paragraph(), info, 16, "C5CAE9")
         tf = box(s, MARGIN, H - Inches(0.9), W - 2 * MARGIN, Inches(0.5))
         add_rich(tf.paragraphs[0], "人工智能技术应用专业系列网络教材 · " + site_url(self.c), 12, "C5CAE9")
@@ -562,20 +564,21 @@ class Deck:
         return self.prs
 
 
-def build(num):
+def build(num, edition=None):
     c = course()
     ch = chapter_by_num(num, c)
     src = SLIDES / f"ch{num:02d}.md"
     if not src.exists():
         print(f"没有 {src.relative_to(ROOT)}，先用正文自动生成底稿（课堂使用前请精简）")
         draft(num)
-    deck = Deck(c, ch)
-    prs = deck.build(parse_deck(src.read_text(encoding="utf-8")))
-    out = BUILD / "课件" / f"第{num:02d}章 {safe_name(ch['title'])}.pptx"
-    out.parent.mkdir(parents=True, exist_ok=True)
-    prs.save(out)
-    note = f"（缺少{'、'.join(sorted(deck.missing))}，先运行 npm run figures）" if deck.missing else ""
-    print(f"已生成 {out.relative_to(ROOT)}，共 {deck.page} 页{note}")
+    for ed in [edition] if edition else list(EDITIONS):
+        deck = Deck(c, ch, ed)
+        prs = deck.build(parse_deck(select_edition(src.read_text(encoding="utf-8"), ed)))
+        out = BUILD / "课件" / EDITIONS[ed] / f"第{num:02d}章 {safe_name(ch['title'])}（{EDITIONS[ed]}）.pptx"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        prs.save(out)
+        note = f"（缺少{'、'.join(sorted(deck.missing))}，先运行 npm run figures）" if deck.missing else ""
+        print(f"已生成 {out.relative_to(ROOT)}，共 {deck.page} 页{note}")
 
 
 if __name__ == "__main__":
@@ -584,4 +587,4 @@ if __name__ == "__main__":
         sys.exit(1)
     nums = [ch["num"] for ch in course()["chapters"]] if sys.argv[2] == "all" else [int(sys.argv[2])]
     for n in nums:
-        draft(n, "--force" in sys.argv) if sys.argv[1] == "draft" else build(n)
+        draft(n, "--force" in sys.argv) if sys.argv[1] == "draft" else build(n, edition_arg(sys.argv))

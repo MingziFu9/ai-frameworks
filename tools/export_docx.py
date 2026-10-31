@@ -5,6 +5,7 @@
     python tools/export_docx.py              # 全书，按 mkdocs.yml 的 nav 顺序，输出 build/<书名>.docx
     python tools/export_docx.py 01-sample    # 只导出一章，输出 build/01-sample.docx
     python tools/export_docx.py --pdf        # 同时用 LibreOffice 转出 PDF（需要安装 LibreOffice）
+    python tools/export_docx.py --edition keras   # 只导出通用版（paddle 为国产版）；不写时两版各导出一份
 
 网页特有的元素按下面的办法转换：交互动画换成动画截图、二维码和网址（扫码即可在手机上操作）；
 Mermaid 图换成渲染好的图片；提示框变成带粗体标题的引用块；在线答题的选项照常列出，
@@ -18,7 +19,7 @@ from pathlib import Path
 
 import yaml
 
-from common import course, mermaid_png, qr_png, sim_png, site_url
+from common import EDITIONS, course, edition_arg, mermaid_png, qr_png, select_edition, sim_png, site_url
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs"
@@ -107,13 +108,20 @@ def convert(md, page="index.md"):
 
 def main():
     OUT.mkdir(exist_ok=True)
-    args = [a for a in sys.argv[1:] if a != "--pdf"]
+    ed = edition_arg(sys.argv)
+    args = [a for a in sys.argv[1:] if not a.startswith("--") and a not in EDITIONS]
+    for edition in [ed] if ed else list(EDITIONS):
+        export(args, edition)
+
+
+def export(args, edition):
+    label = EDITIONS[edition]
     if args:
-        pages, name = [f"chapters/{args[0]}/index.md"], args[0]
+        pages, name = [f"chapters/{args[0]}/index.md"], f"{args[0]}（{label}）"
     else:
-        pages, name = nav_pages(), course()["title"]
-    title = yaml.load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"), Loader=_Loader)["site_name"]
-    body = "\n\n".join(convert((DOCS / p).read_text(encoding="utf-8"), p) for p in pages)
+        pages, name = nav_pages(), f"{course()['title']}（{label}）"
+    title = yaml.load((ROOT / "mkdocs.yml").read_text(encoding="utf-8"), Loader=_Loader)["site_name"] + f"（{label}）"
+    body = "\n\n".join(convert(select_edition((DOCS / p).read_text(encoding="utf-8"), edition), p) for p in pages)
     tmp = OUT / f"{name}.md"
     tmp.write_text(f"---\ntitle: {title}\n---\n\n{body}", encoding="utf-8")
     dst = OUT / f"{name}.docx"

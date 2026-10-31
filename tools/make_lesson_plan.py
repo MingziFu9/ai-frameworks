@@ -5,6 +5,8 @@
     python tools/make_lesson_plan.py draft 3     # 从第 3 章正文生成教案底稿 lesson-plans/ch03.yml（已有则不覆盖，加 --force 覆盖）
     python tools/make_lesson_plan.py build 3     # 把底稿排版成 build/教案/第03章 章名 教案.docx
     python tools/make_lesson_plan.py build all
+    加 --edition keras（或 paddle）只生成通用版（国产版）；不写时两版各生成一份。
+    两版不同的内容写在底稿的 edition_notes: {keras: [...], paddle: [...]} 里，放进“教学资源”。
 
 底稿是 YAML，大部分内容已从正文和 course.yml 自动填好（学时、目标、动画、实验、练习、证书考点），
 标着“【待填】”的地方需要编者补写，build 时会列出还没填的项。字段说明见 lesson-plans/README.md。
@@ -21,7 +23,7 @@ from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
-from common import (BUILD, ROOT, admonition, chapter_by_num, chapter_heading, chapter_text, course, headings,
+from common import (BUILD, EDITION_TOOLS, EDITIONS, edition_arg, ROOT, admonition, chapter_by_num, chapter_heading, chapter_text, course, headings,
                     lab_list, list_items, other_exercises, parse_quizzes, plain, safe_name, section, sims_in,
                     site_url)
 
@@ -218,7 +220,12 @@ def bullet_lines(doc, items, numbered=True):
         para(doc, f"{k}. {x}" if numbered else f"· {x}")
 
 
-def build(num):
+def build(num, edition=None):
+    for ed in [edition] if edition else list(EDITIONS):
+        build_one(num, ed)
+
+
+def build_one(num, ed):
     c = course()
     ch = chapter_by_num(num, c)
     src = PLANS / f"ch{num:02d}.yml"
@@ -226,7 +233,7 @@ def build(num):
         print(f"没有 {src.relative_to(ROOT)}，先自动生成底稿")
         draft(num)
     plan = yaml.safe_load(src.read_text(encoding="utf-8"))
-    text = chapter_text(ch)
+    text = chapter_text(ch, ed)
     lp = c["lesson_plan"]
 
     doc = Document()
@@ -238,7 +245,7 @@ def build(num):
     style.font.name, style.font.size = BODY, Pt(10.5)
     style.element.rPr.rFonts.set(qn("w:eastAsia"), BODY)
 
-    para(doc, f"《{c['title']}》教案", 18, True, HEAD, WD_ALIGN_PARAGRAPH.CENTER, 6)
+    para(doc, f"《{c['title']}》教案（{EDITIONS[ed]}）", 18, True, HEAD, WD_ALIGN_PARAGRAPH.CENTER, 6)
     para(doc, chapter_heading(ch), 14, True, HEAD, WD_ALIGN_PARAGRAPH.CENTER, 12)
 
     total = ch["theory"] + ch["lab"]
@@ -249,6 +256,7 @@ def build(num):
         ["学时", f"共 {total} 学时（理论 {ch['theory']}，{c['lab_word']} {ch['lab']}）", "学时分配", f"线上 {plan['online']} 学时，线下 {plan['offline']} 学时"],
         ["授课时间", "　年　月　日", "授课地点", "　" * 6],
         ["教学方法", "、".join(plan.get("methods", [])), "教材网址", f"{site_url(c)}chapters/{ch['dir']}/"],
+        ["代码版本", f"{EDITIONS[ed]}：{EDITION_TOOLS[ed]}", "云端平台", "魔搭社区 Notebook" if ed == "keras" else "飞桨 AI Studio"],
     ]
     if lp.get("school"):
         rows.insert(0, ["学校", lp["school"], "开课学期", f"第 {c['semester']} 学期"])
@@ -281,8 +289,9 @@ def build(num):
         res.append("交互动画：" + "；".join(f"{t}（{site_url(c)}sims/{n}/）" for n, t in sims))
     labs = lab_list(text, c["lab_word"])
     if labs:
-        res.append(f"{c['lab_word']}：" + "；".join(f"{c['lab_word']} {n} {t.lstrip('★☆ ')}" for n, t, _ in labs) + (f"（代码在 labs/ch{num:02d}/）" if (ROOT / f"labs/ch{num:02d}").is_dir() else ""))
+        res.append(f"{c['lab_word']}：" + "；".join(f"{c['lab_word']} {n} {t.lstrip('★☆ ')}" for n, t, _ in labs) + (f"（代码在 labs/ch{num:02d}/{ed}/）" if (ROOT / f"labs/ch{num:02d}").is_dir() else ""))
     res += plan.get("resources", [])
+    res += (plan.get("edition_notes") or {}).get(ed, [])
     bullet_lines(doc, res)
 
     heading(doc, "四、教学过程")
@@ -292,7 +301,7 @@ def build(num):
             continue
         rows.append([ph["phase"], "", "", "", "", ""])
         for st in ph["steps"]:
-            rows.append([st.get("name", ""), f"{st.get('minutes', '')} 分钟", st.get("content", ""),
+            rows.append([st.get("name", ""), (f"{st['minutes']} 分钟" if isinstance(st.get('minutes'), (int, float)) else str(st.get('minutes', ''))), st.get("content", ""),
                          st.get("teacher", ""), st.get("student", ""), st.get("intent", "")])
     t = table(doc, rows, [1.8, 1.4, 4.2, 3.4, 3.2, 3.0], size=9)
     for i, r in enumerate(rows):
@@ -318,7 +327,7 @@ def build(num):
     for _ in range(4):
         para(doc, "")
 
-    out = BUILD / "教案" / f"第{num:02d}章 {safe_name(ch['title'])} 教案.docx"
+    out = BUILD / "教案" / EDITIONS[ed] / f"第{num:02d}章 {safe_name(ch['title'])} 教案（{EDITIONS[ed]}）.docx"
     out.parent.mkdir(parents=True, exist_ok=True)
     doc.save(out)
     todo = sum(l.count(TODO) for l in src.read_text(encoding="utf-8").split("\n") if not l.lstrip().startswith("#"))
@@ -331,4 +340,4 @@ if __name__ == "__main__":
         sys.exit(1)
     nums = [ch["num"] for ch in course()["chapters"]] if sys.argv[2] == "all" else [int(sys.argv[2])]
     for n in nums:
-        draft(n, "--force" in sys.argv) if sys.argv[1] == "draft" else build(n)
+        draft(n, "--force" in sys.argv) if sys.argv[1] == "draft" else build(n, edition_arg(sys.argv))

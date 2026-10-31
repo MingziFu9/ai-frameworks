@@ -1,0 +1,111 @@
+# 第 6 章教案底稿：自动生成后由编者补写了素养目标、难点与突破、教学过程。改完运行 python tools/make_lesson_plan.py build 6
+chapter: 6
+online: 5
+offline: 1
+methods:
+- 讲授法
+- 案例教学法
+- 演示法
+- 线上自主学习
+- 实验教学法
+objectives:
+  knowledge:
+  - 说出欠拟合、过拟合的含义和常见的改进办法
+  skill:
+  - 读懂训练曲线，判断模型是学得不够、死记硬背还是训练炸了
+  - 运行带早停和自动保存的训练代码，并画出训练曲线
+  - 设计对比实验，比较数据增强、Dropout 的效果，并得出有依据的结论
+  - 使用 TensorBoard 或 VisualDL 比较多次训练的曲线
+  quality:
+  - 用对比实验说话，每次只改一个条件
+  - 如实记录失败的尝试，培养实事求是的态度
+key_points:
+- 训练曲线：模型的成绩走势图
+- 看曲线诊断四种情况
+- 早停：在最好的时候停下来
+- 对付过拟合的两件武器
+difficulties:
+- point: 从训练曲线判断欠拟合、过拟合
+  solution: 展示四种典型曲线，让学生分组判断并说出依据；用“背答案”的比喻解释过拟合
+- point: 理解早停、数据增强、Dropout 为什么能缓解过拟合
+  solution: 结合实验 6-2 四组对比结果的表格，引导学生自己得出结论
+process:
+- phase: 课前（线上，5 学时）
+  steps:
+  - name: 自主学习（一）
+    minutes: 90
+    content: 阅读6.1、6.2、6.3、6.4 节：训练曲线：模型的成绩走势图；看曲线诊断四种情况；早停：在最好的时候停下来；对付过拟合的两件武器；操作交互动画“训练曲线诊断器”
+    teacher: 在学习平台发布学习任务单和预习问题，开放讨论区
+    student: 阅读网页教材、看课件，运行书中的小例子，在讨论区提问
+    intent: 学会看训练曲线，诊断四种常见情况
+  - name: 自主学习（二）
+    minutes: 90
+    content: 阅读6.5、6.6、6.7、6.8 节：超参数与调参的顺序；TensorBoard 与 VisualDL：训练可视化工具；本章常见报错对照；前沿视窗：让机器自己调参
+    teacher: 跟踪学习进度，在讨论区答疑，收集共性问题带到线下课
+    student: 继续阅读，完成在线作答的课后练习
+    intent: 掌握早停、数据增强、Dropout 和调参顺序，会用可视化工具
+  - name: 线上实验
+    minutes: 45
+    content: 实验 6-1 画训练曲线，用早停自动保存最好的模型、实验 6-2 四组对比实验：数据增强和 Dropout 管不管用（☆ 实验选做）
+    teacher: 发布实验指导和记录表，在线答疑
+    student: 在云端 Notebook 上完成第一档“跑通”，尝试第二档“改一改”，填写记录表
+    intent: 把本章方法落到代码上，获得真实的运行结果
+- phase: 课中（线下面授，1 学时）
+  steps:
+  - name: 问题导入
+    minutes: 5
+    content: 回顾情景导入，展示课前讨论区的高频问题
+    teacher: 梳理学生课前的疑问，提出本节课要解决的问题
+    student: 对照自己的预习情况，提出疑问
+    intent: 以学定教，聚焦难点
+  - name: 难点精讲一
+    minutes: 8
+    content: 从训练曲线判断欠拟合、过拟合
+    teacher: 展示四种典型曲线，让学生分组判断并说出依据；用“背答案”的比喻解释过拟合
+    student: 跟随演示操作，回答提问
+    intent: 突破难点
+  - name: 难点精讲二
+    minutes: 8
+    content: 理解早停、数据增强、Dropout 为什么能缓解过拟合
+    teacher: 结合实验 6-2 四组对比结果的表格，引导学生自己得出结论
+    student: 跟随演示操作，回答提问
+    intent: 突破难点
+  - name: 演示与排错
+    minutes: 9
+    content: 现场打开 TensorBoard / VisualDL，比较两次不同学习率的训练曲线
+    teacher: 现场演示，边运行边讲解，示范排错思路
+    student: 观察并在自己的 Notebook 上跟做
+    intent: 把知识用到真实代码上，学会读报错
+  - name: 讨论
+    minutes: 5
+    content: 讨论：调参时为什么一次只改一个超参数？
+    teacher: 组织讨论，点评要点
+    student: 小组讨论并发言
+    intent: 联系实际，培养职业素养
+  - name: 课堂练习与小结
+    minutes: 10
+    content: 在网页上完成本章 3–5 道在线练习；用本章知识导图回顾要点
+    teacher: 讲评错误率高的题，带领梳理知识导图，布置作业
+    student: 在线作答，复述本章要点
+    intent: 即时检验，形成知识结构
+- phase: 课后（线上）
+  steps:
+  - name: 课后巩固
+    minutes: 课余
+    content: 完成本章课后练习（简答、实操题），提交实验报告；选做 ☆ 实验
+    teacher: 批改作业和实验报告，在讨论区答疑
+    student: 完成练习，错题点“回看”复习对应小节
+    intent: 巩固知识，形成技能
+homework:
+- 简答题：用“学生学习”的比喻，分别说明欠拟合和过拟合。
+- 简答题：说明 Dropout 为什么能减轻过拟合。
+- 简答题：小林训练了一个模型，训练准确率 100%、验证准确率 50%。他下一步应该怎么做？请按优先顺序给出建议。
+- 实操题：在实验 6-2 第 ③ 组（只开数据增强）的基础上，加上早停（patience=5，盯验证损失，恢复最好的一轮），训练最多 50 轮。记录训练了几轮、最好的一轮是第几轮、最好一轮的验证准确率，并画出训练曲线，诊断它属于哪种情况。
+- 实验报告：实验 6-1、实验 6-2、实验 6-3
+assessment: 课堂练习正确率、课后作业和实验报告计入平时成绩
+reflection: ''
+edition_notes:
+  keras:
+  - 本版代码：labs/ch06/keras/，使用 Keras 3（TensorFlow 后端），建议在魔搭社区 Notebook 上运行
+  paddle:
+  - 本版代码：labs/ch06/paddle/，使用飞桨 PaddlePaddle，建议在飞桨 AI Studio 上运行
