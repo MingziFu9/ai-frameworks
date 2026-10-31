@@ -1,8 +1,41 @@
-# 《课程名称》实验环境（写明教材编写时实测通过的版本，Python 3.11）
-# 安装：pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
-# 只列学生实验真正用到的库，版本号必须是编者实际运行过的；需要 GPU 的库单独写在下面并注明
-pandas
-numpy
-matplotlib
-scikit-learn
-jupyter
+# 《人工智能开发框架技术》实验环境：Python 3.11，下面是编者 2026 年 10 月在 CPU 上实测通过的版本
+# 安装（清华镜像）：pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 只用一个版本的同学，可以只装“公共部分”加自己那一版
+
+# ---------- 公共部分（两版都要） ----------
+numpy==2.3.5
+pandas==3.1.0
+matplotlib==3.11.2
+pillow==12.3.0
+scipy==1.17.1
+scikit-learn==1.9.1
+jupyter==1.1.1
+jieba==0.42.1            # 第 9、12 章
+gradio==6.31.0           # 第 11 章
+onnx==1.17.0             # 第 11 章
+onnxruntime==1.31.1      # 第 11 章
+ultralytics==8.4.194     # 第 8 章 YOLO（两版都用来做对照）
+rapidocr-onnxruntime==1.4.4   # 第 8 章文字识别
+sherpa-onnx==2.0.1       # 第 10 章语音识别与合成
+soundfile==0.14.0        # 第 10 章
+openai==3.42.0           # 第 9 章调用大模型 API（DeepSeek、千帆都兼容这个库）
+
+# ---------- 通用版 ----------
+tensorflow-cpu==2.21.0   # Keras 3 的后端；有 NVIDIA 显卡可换成 tensorflow
+keras==3.15.1
+tensorboard==2.21.0      # 第 6 章
+tf2onnx==1.17.0          # 第 11 章
+torch==2.15.0            # 只在第 5 章实验 5-2 里对照“手写训练循环”
+torchvision==0.29.2
+# transformers           # 第 9 章实验 9-1 现成情感模型，需能访问 Hugging Face，待实测
+
+# ---------- 国产版 ----------
+paddlepaddle==3.3.1      # 有 NVIDIA 显卡可换成 paddlepaddle-gpu，见飞桨官网安装页
+visualdl==2.5.3          # 第 6 章
+paddlex==3.7.2           # 第 8 章检测、分割（模型从百度服务器下载，待实测）
+paddleocr==3.7.0         # 第 8 章
+paddle2onnx==2.1.0       # 第 11 章
+# paddlenlp              # 第 9、12 章 Taskflow，模型从百度服务器下载，待实测
+
+# ---------- 第 12 章昇思体验（单独建环境） ----------
+# mindspore==2.11.0 需要 numpy<2，请另建虚拟环境：pip install mindspore==2.11.0 "numpy<2"
