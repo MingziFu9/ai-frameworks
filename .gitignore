@@ -14,3 +14,10 @@ node_modules/
 *.onnx
 logs/
 runs/
+vdl_log/
+checkpoint/
+labs/**/curves.png
+labs/**/result.jpg
+labs/ch08/**/*.csv
+*.pdiparams
+labs/ch*/*/*.png

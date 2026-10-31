@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>冻结几层好</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+.stack { display:flex; gap:1px; height:46px; margin:8px 0 2px; max-width:700px; }
+.stack div { flex:1; background:#90a4ae; border-radius:1px; transition:background .25s; }
+.stack div.hot { background:var(--warn); }
+.stack div.head { flex:0 0 26px; background:var(--pos); border-radius:4px; margin-left:4px; }
+.axis { display:flex; justify-content:space-between; max-width:700px; font-size:11px; color:var(--muted); }
+.barrow { grid-template-columns:12em 1fr 4em; max-width:700px; }
+.bar.base { background:#b0bec5; } .bar.cur { background:var(--warn); }
+.key i { display:inline-block; width:12px; height:12px; border-radius:2px; vertical-align:middle; margin:0 4px 0 10px; }
+</style>
+</head>
+<body>
+<h1>冻结几层好</h1>
+<div class="sub">MobileNetV2 有 154 层（灰色，冻结），绿色是我们新接的输出层。点按钮选择解冻最后几层（橙色），看可训练参数和验证准确率怎么变。</div>
+<div class="row" id="btns"></div>
+<div class="stack" id="stack"></div>
+<div class="axis"><span>← 第 1 层：浅层，看边缘、颜色</span><span>深层，看整体形状：第 154 层 → 输出层</span></div>
+<div class="key note"><i style="background:#90a4ae"></i>冻结 <i style="background:#ef6c00"></i>解冻（跟着训练） <i style="background:#43a047"></i>新输出层</div>
+<div class="box" style="max-width:700px">
+  <div class="row"><span>可训练参数：</span><b class="big mono" id="np"></b></div>
+  <div id="bars"></div>
+</div>
+<div class="msg" id="msg"></div>
+<div class="note">数据来源：实验 7-1、7-3 通用版（Keras 3.15.1）的实际运行结果。先只训练输出层 10 轮，再解冻最后若干层、用学习率 0.00001 训练 10 轮。从零训练的结果来自实验 5-1。</div>
+<script>
+(function () {
+  var R = [
+    { n: 0, p: 6405, acc: 82.67, msg: "<b>只训练输出层（冻结全部 154 层）：</b>只有 6,405 个参数要学，训练很快，验证准确率就从从零训练的 54.7% 跳到 82.7%。借来的“眼睛”已经很会看图了。" },
+    { n: 30, p: 1532805, acc: 86.0, msg: '<b class="ok">解冻最后 30 层：</b>让最后几块“看整体形状”的层也跟着我们的花卉照片微调，验证准确率再提高到 86.0%，是四种做法里最好的。' },
+    { n: 60, p: 1962117, acc: 85.33, msg: "<b>解冻最后 60 层：</b>要学的参数接近 200 万，验证准确率 85.3%，比解冻 30 层略低。600 张照片要调这么多参数，有点“喂不饱”。" },
+    { n: 154, p: 2230277, acc: 84.0, msg: '<b class="bad">全部解冻：</b>连“看边缘、颜色”的前几层也一起改，参数 223 万，验证准确率反而降到 84.0%。数据少时，前面的通用本领最好别动。' }
+  ];
+  var $ = function (id) { return document.getElementById(id); };
+  var st = ""; for (var i = 0; i < 154; i++) st += "<div></div>"; $("stack").innerHTML = st + '<div class="head"></div>';
+  $("btns").innerHTML = R.map(function (r, i) { return '<button data-i="' + i + '">' + (r.n === 0 ? "全部冻结" : r.n === 154 ? "全部解冻" : "解冻最后 " + r.n + " 层") + "</button>"; }).join("");
+  function show(i) {
+    var r = R[i], cells = $("stack").children;
+    for (var k = 0; k < 154; k++) cells[k].classList.toggle("hot", k >= 154 - r.n);
+    document.querySelectorAll("#btns button").forEach(function (b, k) { b.classList.toggle("on", k === i); });
+    $("np").textContent = r.p.toLocaleString();
+    var rows = [["从零训练（第 5 章）", 54.67, "base"], ["只训练输出层", 82.67, "base"], ["当前选择", r.acc, "cur"]];
+    $("bars").innerHTML = rows.map(function (x) { return '<div class="barrow"><span>' + x[0] + '</span><div><div class="bar ' + x[2] + '" style="width:' + x[1] + '%"></div></div><span class="v">' + x[1].toFixed(1) + "%</span></div>"; }).join("");
+    $("msg").innerHTML = r.msg;
+  }
+  document.querySelectorAll("#btns button").forEach(function (b) { b.onclick = function () { show(+b.dataset.i); }; });
+  show(1);
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>

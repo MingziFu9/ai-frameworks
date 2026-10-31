@@ -96,11 +96,23 @@ description: 本书主要术语的中英文名称、简明定义和例子，按�
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-训练曲线"></span>训练曲线 | Training Curve | 把每一轮训练集和验证集的损失、准确率画成的折线图，用来判断训练情况 | `plt.plot(history.history["val_loss"])` |
+| <span id="g-欠拟合"></span>欠拟合 | Underfitting | 模型没学到规律，训练集和验证集上成绩都差的现象 | 学习率 0.00001 训练 30 轮，训练、验证准确率都在五成左右 |
+| <span id="g-过拟合"></span>过拟合 | Overfitting | 模型在训练集上表现好、在新数据上表现差的现象，好比死记硬背 | 训练准确率 100%，验证准确率只有 53% |
+| <span id="g-回调"></span>回调 | Callback | 交给 fit 的“助手”，在每一轮训练前后自动执行某些操作，如早停、保存模型、记录日志 | `callbacks=[EarlyStopping(...)]` |
+| <span id="g-早停"></span>早停 | Early Stopping | 验证成绩连续若干轮没有变好就自动停止训练，并保留最好那一轮的模型 | `patience=5`：连续 5 轮验证损失没降就停 |
+| <span id="g-Dropout"></span>Dropout | Dropout | 训练时每一批随机让一部分神经元暂时不工作，防止网络过分依赖某几个神经元，从而减轻过拟合 | `layers.Dropout(0.5)` |
+| <span id="g-超参数"></span>超参数 | Hyperparameter | 训练前由人设定、不由模型自己学习的设置，如学习率、轮次、批大小、Dropout 比例 | 学习率 0.001、轮次 30 |
 
 ## 第 7 章 迁移学习：站在别人的肩膀上
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-迁移学习"></span>迁移学习 | Transfer Learning | 把在一个任务（通常是大数据集）上训练好的模型，拿来作为新任务的起点继续训练的方法 | 用 ImageNet 预训练的 MobileNetV2 认 5 种花 |
+| <span id="g-特征"></span>特征 | Feature | 网络从输入数据中提炼出来、对完成任务有用的信息，如边缘、纹理、形状 | MobileNetV2 从一张照片提炼出的 1280 个数 |
+| <span id="g-冻结"></span>冻结 | Freezing | 训练时让某些层的参数保持不变、不参与更新 | `base.trainable = False` |
+| <span id="g-微调"></span>微调 | Fine-tuning | 在迁移学习中解冻预训练模型的部分层，用很小的学习率继续训练，让它更适应新任务 | 解冻最后 30 层，学习率 0.00001 |
+| <span id="g-混淆矩阵"></span>混淆矩阵 | Confusion Matrix | 按“实际类别 × 预测类别”交叉统计样本数量的表格，用来看模型把哪些类别搞混了 | 郁金香那一行有 4 张被认成玫瑰 |
 
 ## 第 8 章 图像应用：检测与文字识别
 

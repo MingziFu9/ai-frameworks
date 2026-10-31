@@ -1,0 +1,7 @@
+本文件夹的图片选自 TensorFlow 官方花卉数据集 flower_photos，按 CC BY 2.0 许可使用（未缩放）：
+https://creativecommons.org/licenses/by/2.0/ ，各图作者如下：
+
+detect_photos/tulip_field.jpg  ←  tulips/13513616525_2ee0f049e1.jpg CC-BY by nikontino - https://www.flickr.com/photos/nikontino/13513616525/
+detect_photos/canal_street.jpg  ←  tulips/3447650747_8299786b80_n.jpg CC-BY by Maks Karochkin - https://www.flickr.com/photos/karochkin/3447650747/
+detect_photos/glass_domes.jpg  ←  roses/15255964454_0a64eb67fa.jpg CC-BY by ProFlowers - https://www.flickr.com/photos/proflowers/15255964454/
+detect_photos/grey_roses.jpg  ←  roses/6969041818_a505baa68e_m.jpg CC-BY by edward musiak - https://www.flickr.com/photos/edwardmusiak/6969041818/
