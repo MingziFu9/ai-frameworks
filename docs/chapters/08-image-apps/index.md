@@ -21,7 +21,7 @@ description: 用现成的 YOLO / PP-YOLOE+ 模型框出照片里的东西并数�
 !!! info "先修要求"
     学习本章前，你需要掌握：
 
-    - 预训练模型、置信度和文字识别（[2.1 节](../02-pretrained/index.md#21)、[2.4 节](../02-pretrained/index.md#24)）；
+    - 预训练模型、置信度和文字识别（[2.1 节](../02-pretrained/index.md#21)、[2.3 节](../02-pretrained/index.md#23)）；
     - 图片是一堆数字、坐标从左上角算起（[3.1 节](../03-data/index.md#31)）；
     - 迁移学习“什么时候直接用现成模型”（[7.1.3](../07-transfer/index.md#713)）；
     - 附录 A 中的列表、字典和 for 循环。
@@ -316,7 +316,7 @@ table = [[t for x, t in sorted(cells)] for y, cells in sorted(rows.items())]   #
 ['合计金额：595.00元']
 ```
 
-只留下正好 4 列的行，交给第 1 章用过的 pandas 做成表格：
+只留下正好 4 列的行，交给 **pandas** 做成表格。pandas 是 Python 里处理表格数据最常用的库，可以把它想象成“用代码操作的 Excel”，`DataFrame` 就是其中的一张表：
 
 ```python
 import pandas as pd
@@ -519,7 +519,7 @@ grey_roses {'donut': 17}
 1. 把函数改成只数一种东西：加一个参数 `target="person"`，最后返回 `Counter(names)[target]`；
 2. 用自己拍的停车场或路口照片，数一数有几辆车。
 
-第三档 · 挑战：用 for 循环检测一个文件夹里的所有照片（比如每小时拍一张的花田照片），把“照片名、人数”存成一张 CSV 表格，再用第 1 章学过的 pandas 画出人数随时间变化的折线图。
+第三档 · 挑战：用 for 循环检测一个文件夹里的所有照片（比如每小时拍一张的花田照片），把“照片名、人数”存成一张 CSV 表格，再用 `df.plot(x="照片名", y="人数")` 画出人数随时间变化的折线图。
 
 **实验记录表**
 

@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>文字变数字</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+input#txt { width:100%; max-width:520px; font-size:15px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; }
+.step { display:grid; grid-template-columns:7.5em 1fr; gap:8px; align-items:start; margin:10px 0; }
+.step .h { font-size:13px; color:var(--accent); font-weight:bold; padding-top:4px; }
+.tok { font-size:15px; }
+.tok.unk { background:#ffebee; color:var(--neg); }
+.tok.pad { color:#b0bec5; }
+.tok.cut { text-decoration:line-through; color:#b0bec5; }
+.id { display:inline-block; min-width:2.2em; text-align:center; padding:2px 4px; margin:2px; border-radius:4px; background:var(--soft); font-family:ui-monospace,Consolas,monospace; font-size:13px; }
+.id.unk { background:#ffebee; color:var(--neg); } .id.pad { background:#f5f5f5; color:#b0bec5; }
+</style>
+</head>
+<body>
+<h1>文字变数字</h1>
+<div class="sub">模型只认识数字。输入一句评论，看它怎样一步步变成一串固定长度的编号：逐字切分 → 查词表编号 → 填充或截断。</div>
+<div class="row"><input id="txt" value="味道很好，下次还点"></div>
+<div class="row ex"><span class="lbl">试试：</span>
+  <button>等了两个小时，菜都凉了</button><button>包装很好，可惜味道太咸了</button><button>这家的麻辣烫绝绝子</button><button>虽然配送超快，但是袋子都湿了，骑手态度差，肉不新鲜，再也不点了</button>
+</div>
+<div class="row"><span>固定长度</span><input type="range" id="len" min="8" max="40" value="20"><span class="mono big" id="lenv"></span></div>
+<div class="step"><div class="h">① 逐字切分</div><div id="s1"></div></div>
+<div class="step"><div class="h">② 查词表编号</div><div id="s2"></div></div>
+<div class="step"><div class="h">③ 填充 / 截断</div><div id="s3"></div></div>
+<div id="msg" class="msg"></div>
+<div class="note">词表来自实验 9-2 的 1200 条训练评论（共 <span id="vn"></span> 个字），按出现次数从多到少编号：0 留给填充 &lt;pad&gt;，1 留给词表里没有的字 &lt;unk&gt;。教材实验的固定长度是 40。</div>
+<script src="../common/sim.js"></script>
+<script>
+(function () {
+  var VOCAB = ["<pad>", "<unk>", "，", "了", "很", "不", "送", "好", "得", "~", "。", "！", "是", "点", "骑", "手", "都", "少", "量", "太", "包", "装", "吃", "但", "时", "一", "推", "荐", "味", "肉", "虽", "然", "评", "没", "快", "到", "差", "还", "回", "态", "度", "做", "可", "怜", "备", "注", "分", "配", "餐", "盒", "超", "两", "个", "久", "人", "饱", "错", "会", "购", "的", "小", "就", "比", "道", "汤", "洒", "价", "半", "下", "次", "失", "望", "客", "服", "多", "退", "款", "过", "油", "五", "星", "再", "也", "满", "意", "老", "板", "热", "情", "袋", "子", "湿", "破", "照", "米", "饭", "香", "慢", "精", "致", "给", "保", "温", "准", "看", "等", "漏", "大", "干", "净", "般", "严", "实", "饮", "料", "足", "预", "计", "早", "迟", "格", "贵", "理", "简", "陋", "份", "性", "高", "复", "入", "软", "辣", "瘾", "夹", "生", "特", "别", "难", "口", "正", "宗", "酸", "甜", "适", "中", "有", "股", "怪", "新", "鲜", "嫩", "咸", "菜", "凉"], IDX = {}, $ = function (id) { return document.getElementById(id); };
+  VOCAB.forEach(function (w, i) { IDX[w] = i; });
+  $("vn").textContent = VOCAB.length;
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  function run() {
+    var t = $("txt").value, L = +$("len").value, chars = Array.from(t);
+    $("lenv").textContent = L;
+    var ids = chars.map(function (c) { return IDX[c] === undefined ? 1 : IDX[c]; });
+    $("s1").innerHTML = chars.map(function (c, i) { return '<span class="tok' + (ids[i] === 1 ? " unk" : "") + (i >= L ? " cut" : "") + '">' + esc(c) + "</span>"; }).join("") || '<span class="muted">（空）</span>';
+    $("s2").innerHTML = ids.map(function (d, i) { return '<span class="id' + (d === 1 ? " unk" : "") + '" title="' + esc(chars[i]) + '">' + d + "</span>"; }).join("");
+    var out = ids.slice(0, L); while (out.length < L) out.push(0);
+    $("s3").innerHTML = out.map(function (d, i) { return '<span class="id' + (d === 1 ? " unk" : d === 0 && i >= ids.length ? " pad" : "") + '">' + d + "</span>"; }).join("");
+    var unk = ids.filter(function (d) { return d === 1; }).length, m = [];
+    m.push("一共 <b>" + chars.length + "</b> 个字（标点也算）");
+    if (unk) m.push('<span class="bad">' + unk + " 个字词表里没有，都变成了 1</span>，模型完全看不出它们是什么");
+    if (chars.length < L) m.push("后面补了 <b>" + (L - chars.length) + "</b> 个 0");
+    if (chars.length > L) m.push('<span class="bad">超出的 ' + (chars.length - L) + " 个字被截掉了</span>");
+    $("msg").innerHTML = m.join("；") + "。";
+  }
+  $("txt").addEventListener("input", run); $("len").addEventListener("input", run);
+  Array.prototype.forEach.call(document.querySelectorAll(".ex button"), function (b) { b.onclick = function () { $("txt").value = b.textContent; run(); }; });
+  run();
+})();
+</script>
+</body>
+</html>
