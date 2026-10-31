@@ -65,6 +65,7 @@ nav:
     - "冻结几层好": sims/freeze-layers/index.md
     - "置信度门槛": sims/confidence-threshold/index.md
     - "文字变数字": sims/text-to-numbers/index.md
+    - "看见声音": sims/hear-sound/index.md
   - 学习图谱: learning-graph/index.md
   - 常见问题: faq/index.md
   - 附录:

@@ -21,3 +21,8 @@ labs/**/result.jpg
 labs/ch08/**/*.csv
 *.pdiparams
 labs/ch*/*/*.png
+*.tar.bz2
+labs/ch10/*/*.onnx
+labs/ch10/*/matcha-icefall-zh-baker/
+labs/ch10/*/sherpa-onnx-*/
+labs/**/tts.wav
