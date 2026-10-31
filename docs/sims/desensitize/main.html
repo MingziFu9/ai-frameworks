@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>个人信息脱敏</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+textarea { width:100%; box-sizing:border-box; height:120px; font-size:13.5px; padding:6px 8px; border:1px solid var(--line); border-radius:6px; font-family:inherit; }
+#out { white-space:pre-wrap; font-size:13.5px; line-height:1.8; border:1px solid var(--line); border-radius:6px; padding:8px 10px; background:#fafafa; min-height:60px; }
+mark { background:#fff3e0; color:var(--warn); border-radius:3px; padding:0 2px; }
+.rules label { font-size:13px; margin-right:14px; white-space:nowrap; }
+code.re { font-size:12px; color:var(--muted); }
+table.r { border-collapse:collapse; font-size:12.5px; margin-top:6px; }
+table.r td, table.r th { border:1px solid var(--line); padding:3px 8px; text-align:left; }
+table.r th { background:#f5f5f5; font-weight:normal; color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>个人信息脱敏</h1>
+<div class="sub">上面是一段客服记录（内容为虚构），可以随意修改。勾选规则，下面实时显示脱敏后的结果，橙色是被遮住的地方。</div>
+<textarea id="src"></textarea>
+<div class="row rules" id="rules"></div>
+<div id="out"></div>
+<div id="msg" class="msg"></div>
+<div style="overflow-x:auto"><table class="r" id="tbl"></table></div>
+<div class="note">规则和实验 12-1 的代码相同（JavaScript 的正则写法和 Python 一样）。人名的识别要靠分词或命名实体识别模型，本动画不做，见实验 12-1。试试：把某个手机号中间的短横线换成空格，看看还能不能被找到。</div>
+<script src="../common/sim.js"></script>
+<script>
+(function () {
+  var SRC = "【2026-10-28 09:12】顾客张三来电，手机号13900001234，说昨天订的红玫瑰花束送错了地址，应该送到幸福路88号3栋502。已安排重新配送。\n【2026-10-28 10:45】顾客李四要开发票，抬头写个人，身份证号990101199001011234，发票发到邮箱 lisi_flower@example.com。\n【2026-10-28 14:03】王小明投诉骑手态度差，联系电话 139-0000-5678，要求退款 128 元，退到尾号 4321 的银行卡 6222 0000 0000 4321。\n【2026-10-29 08:30】赵敏预订明天的生日花篮，收货人陈晓华，电话13900008888，地址：东风大街12号，备注“不要写卡片”。\n【2026-10-29 16:20】顾客孙丽华反映满天星有点蔫，同意补发一束，联系方式 13900002468，身份证 99010119951212567X 用于核实会员。", $ = function (id) { return document.getElementById(id); };
+  var RULES = [
+    { name: "身份证号", re: "\\d{17}[\\dXx]", head: 6, tail: 4 },
+    { name: "银行卡号", re: "\\d{4} \\d{4} \\d{4} \\d{4}", head: 0, tail: 4 },
+    { name: "手机号", re: "1[3-9]\\d-?\\d{4}-?\\d{4}", head: 3, tail: 4 },
+    { name: "门牌号", re: "\\d+号[\\d栋单元室]*", head: 0, tail: 0 },
+    { name: "邮箱", re: "[\\w.]+@", head: 0, tail: 1 }
+  ];
+  function mask(s, h, t) { return s.slice(0, h) + "*".repeat(Math.max(0, s.length - h - t)) + s.slice(s.length - t); }
+  function esc(s) { return s.replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+  $("src").value = SRC;
+  RULES.forEach(function (r, i) {
+    var l = document.createElement("label");
+    l.innerHTML = '<input type="checkbox" checked data-i="' + i + '"> ' + r.name;
+    $("rules").appendChild(l);
+  });
+  function run() {
+    var text = $("src").value, on = [], marks = [], rows = "<tr><th>规则</th><th>正则表达式</th><th>找到</th><th>保留</th></tr>", total = 0;
+    Array.prototype.forEach.call(document.querySelectorAll("#rules input"), function (c) { if (c.checked) on.push(RULES[+c.dataset.i]); });
+    on.forEach(function (r) {
+      var n = 0;
+      text = text.replace(new RegExp(r.re, "g"), function (m) { n++; var k = "\u0001" + marks.length + "\u0002"; marks.push(mask(m, r.head, r.tail)); return k; });
+      total += n;
+      rows += "<tr><td>" + r.name + "</td><td><code class='re'>" + esc(r.re) + "</code></td><td>" + n + " 处</td><td>" + (r.name === "邮箱" ? "@ 及后面" : "前 " + r.head + " 位、后 " + r.tail + " 位") + "</td></tr>";
+    });
+    var html = esc(text).replace(/\u0001(\d+)\u0002/g, function (_, i) { return "<mark>" + esc(marks[+i]) + "</mark>"; });
+    $("out").innerHTML = html; $("tbl").innerHTML = rows;
+    $("msg").innerHTML = "一共遮住 <b>" + total + "</b> 处。" + (on.length < RULES.length ? '<span class="bad">有规则没勾选，对应的信息还露在外面。</span>' : "");
+  }
+  $("src").addEventListener("input", run);
+  $("rules").addEventListener("change", run);
+  run();
+})();
+</script>
+</body>
+</html>

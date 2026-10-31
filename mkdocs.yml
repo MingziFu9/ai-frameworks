@@ -67,6 +67,7 @@ nav:
     - "文字变数字": sims/text-to-numbers/index.md
     - "看见声音": sims/hear-sound/index.md
     - "模型压缩": sims/model-compress/index.md
+    - "个人信息脱敏": sims/desensitize/index.md
   - 学习图谱: learning-graph/index.md
   - 常见问题: faq/index.md
   - 附录:

@@ -61,7 +61,7 @@
 | [第 9 章 文本应用：让模型读懂文字](chapters/09-text-apps/index.md) | 实验 9-1 ★ 一行代码做情感分析<br>实验 9-2 ★ 训练一个外卖评论分类器<br>实验 9-3 ☆ 用大模型 API 做同一件事 |
 | [第 10 章 语音应用：让模型听懂声音](chapters/10-speech-apps/index.md) | 实验 10-1 ★ 看见声音：波形和声谱图<br>实验 10-2 ★ 训练一个语音指令识别器<br>实验 10-3 ☆ 语音合成与语音识别体验 |
 | [第 11 章 把模型做成应用](chapters/11-deploy/index.md) | 实验 11-1 ★ 做一个花卉识别网页<br>实验 11-2 ★ 发布给同学用<br>实验 11-3 ☆ 导出 ONNX，比一比大小和速度 |
-| [第 12 章 国产 AI 生态、数据安全与综合项目](chapters/12-ecosystem/index.md) | 实验 12-1 ★ 实验名称<br>实验 12-2 ★ 实验名称<br>实验 12-3 ★ 实验名称 |
+| [第 12 章 国产 AI 生态、数据安全与综合项目](chapters/12-ecosystem/index.md) | 实验 12-1 ★ 给一份客服记录做脱敏<br>实验 12-2 ★ 综合项目<br>实验 12-3 ☆ 昇思 MindSpore 体验 |
 
 附录：[A 零基础 Python 入门](appendix/a-python.md) · [B 通用版与国产版代码对照](appendix/b-libraries.md) · [C 实验环境与数据说明](appendix/c-environment.md) · [D 术语表](appendix/glossary.md) · [E 实验报告模板与综合项目指南](appendix/e-project.md) · [F 期末模拟卷](appendix/f-mock-exam.md)
 <!-- toc:end -->
