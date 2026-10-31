@@ -69,6 +69,16 @@ description: 本书主要术语的中英文名称、简明定义和例子，按�
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-神经元"></span>神经元 | Neuron | 神经网络中最小的计算单元，把输入的数各乘一个权重再相加、加上偏置，经过激活函数后输出一个数 | 总分 = 花瓣长 × 0.8 + 花瓣宽 × 0.5 + 0.1 |
+| <span id="g-神经网络"></span>神经网络 | Neural Network | 由许多神经元分层连接而成的模型，数据从输入层经过若干隐藏层传到输出层 | 输入 4 个数 → 隐藏层 8 个神经元 → 输出 3 个概率 |
+| <span id="g-激活函数"></span>激活函数 | Activation Function | 神经元算出总分后再经过的一道变换，给网络加入“拐弯”的能力；最常用的是 ReLU | ReLU(-2) = 0，ReLU(3.5) = 3.5 |
+| <span id="g-全连接层"></span>全连接层 | Fully Connected Layer | 每个神经元都和上一层所有输出相连的层；Keras 中叫 Dense，飞桨中叫 Linear | `layers.Dense(64)`、`nn.Linear(12544, 64)` |
+| <span id="g-Softmax"></span>Softmax | Softmax | 把一组分数变成加起来等于 1 的概率的函数，常用在分类网络的输出层 | 输出 [0.1, 0.7, 0.2] |
+| <span id="g-卷积层"></span>卷积层 | Convolutional Layer | 用许多个小窗口（卷积核）在图片上逐格滑动、寻找局部特征的层；Keras 中叫 Conv2D | `layers.Conv2D(16, 3)`：16 个 3×3 的窗口 |
+| <span id="g-池化层"></span>池化层 | Pooling Layer | 把图片按小方块（如 2×2）缩小、只保留每块中最大值的层，用来缩小数据、保留明显特征 | 126×126 变成 63×63 |
+| <span id="g-参数量"></span>参数量 | Number of Parameters | 模型中所有要在训练中学习的数（权重和偏置）的总个数，反映模型的大小 | 花卉网络 826,789 个参数 |
+| <span id="g-对象"></span>对象 | Object | 程序中把数据和它能做的操作打包在一起的东西，如搭好的模型 model | `model = keras.Sequential([...])` |
+| <span id="g-方法"></span>方法 | Method | 属于某个对象的函数，用“对象.方法名()”调用 | `model.summary()` |
 
 ## 第 5 章 训练模型：fit 背后发生了什么
 

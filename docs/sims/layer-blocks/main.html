@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>搭积木：网络结构表</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+table.t { width:100%; max-width:640px; }
+table.t td { font-variant-numeric:tabular-nums; }
+table.t td:first-child { text-align:left; }
+tr.err td { background:#ffebee; }
+tr.inp td { background:#f5f7fa; color:var(--muted); }
+.x { border:none; color:var(--muted); padding:0 6px; }
+.tag { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px; vertical-align:middle; }
+.total { font-size:15px; margin-top:8px; }
+.big { color:var(--accent); }
+</style>
+</head>
+<body>
+<h1>搭积木：网络结构表</h1>
+<div class="sub">点上方按钮把一块“积木”加到网络最下面，点 × 删掉一块。表格会像 <span class="mono">model.summary()</span> 一样算出每层的输出形状和参数量。输入固定为 128×128 的彩色照片，按通用版（通道在最后）显示。</div>
+<div class="row ex"><span class="lbl">添加：</span>
+  <button data-add="conv:16">卷积 16</button><button data-add="conv:32">卷积 32</button><button data-add="conv:64">卷积 64</button>
+  <button data-add="pool">池化</button><button data-add="flat">展平</button>
+  <button data-add="dense:64">全连接 64</button><button data-add="dense:5">输出 5</button>
+</div>
+<div class="row ex"><span class="lbl">示例：</span>
+  <button id="p1">本书的花卉网络</button><button id="p2">少一组卷积</button><button id="p3">只有全连接</button><button id="clr">清空</button>
+</div>
+<table class="t"><thead><tr><th>层</th><th>输出形状</th><th>参数量</th><th></th></tr></thead><tbody id="tb"></tbody></table>
+<div class="total" id="total"></div>
+<div class="msg" id="msg"></div>
+<div class="note">卷积层用 3×3 的“放大镜”、不补边，所以每过一层边长减 2；池化层用 2×2，边长减半（除不尽时舍去）。参数量算法：卷积层 =（3×3×输入通道数 + 1）× 放大镜个数；全连接层 =（输入个数 + 1）× 神经元个数。“+1”是每个神经元的偏置。</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, L = [];
+  var NAME = { conv: "卷积层 Conv2D", pool: "池化层 MaxPooling2D", flat: "展平层 Flatten", dense: "全连接层 Dense" };
+  var COLOR = { conv: "#3f51b5", pool: "#90a4ae", flat: "#ffb300", dense: "#43a047" };
+  function render() {
+    var h = '<tr class="inp"><td>输入 Input</td><td class="mono">(128, 128, 3)</td><td>0</td><td></td></tr>';
+    var s = [128, 128, 3], total = 0, err = "", big = { n: 0, i: -1 };
+    L.forEach(function (l, i) {
+      var p = 0, bad = "";
+      if (err) bad = "—";
+      else if (l.t === "conv") { if (s.length !== 3) bad = "卷积层要接在“图片形状”的数据后面，展平之后不能再卷积"; else if (s[0] < 3) bad = "图片已经缩得太小（小于 3×3），放大镜放不下了"; else { p = (9 * s[2] + 1) * l.n; s = [s[0] - 2, s[1] - 2, l.n]; } }
+      else if (l.t === "pool") { if (s.length !== 3) bad = "池化层要接在“图片形状”的数据后面"; else if (s[0] < 2) bad = "图片已经只剩 1×1，没法再缩小"; else s = [Math.floor(s[0] / 2), Math.floor(s[1] / 2), s[2]]; }
+      else if (l.t === "flat") { if (s.length !== 3) bad = "数据已经是一长串了，不用再展平"; else s = [s[0] * s[1] * s[2]]; }
+      else if (l.t === "dense") { if (s.length !== 1) bad = "全连接层前面要先“展平”成一长串数字"; else { p = (s[0] + 1) * l.n; s = [l.n]; } }
+      if (bad && !err) err = "第 " + (i + 1) + " 块（" + NAME[l.t] + "）出错：" + bad + "。";
+      total += p; if (p > big.n) big = { n: p, i: i };
+      h += '<tr class="' + (bad ? "err" : "") + '"><td><span class="tag" style="background:' + COLOR[l.t] + '"></span>' + NAME[l.t] + (l.n ? " " + l.n : "") +
+        '</td><td class="mono">' + (bad ? "—" : "(" + (s.length === 1 ? s[0] + "," : s.join(", ")) + ")") + '</td><td>' + (bad ? "—" : p.toLocaleString()) +
+        '</td><td><button class="x" data-del="' + i + '" title="删掉">×</button></td></tr>';
+    });
+    $("tb").innerHTML = h;
+    $("total").innerHTML = err ? "" : "总参数量：<b class='big'>" + total.toLocaleString() + "</b> 个要学的数" + (total ? "，约 " + (total * 4 / 1048576).toFixed(2) + " MB" : "");
+    var m = "";
+    if (err) m = '<b class="bad">搭不上：</b>' + err;
+    else if (!L.length) m = "网络是空的，从上面加几块积木试试。";
+    else if (s.length !== 1 || s[0] !== 5) m = "提示：最后一层要输出 5 个数（5 种花各一个概率），可以加一块“输出 5”。";
+    else m = '<b class="ok">搭好了！</b>参数最多的是第 ' + (big.i + 1) + " 块，占全部的 " + (big.n / total * 100).toFixed(0) + "%。" +
+      (L[big.i].t === "dense" ? "展平后的数越多，紧跟着的全连接层参数就越多。多加一组“卷积 + 池化”把图片缩小，参数反而会变少。" : "");
+    $("msg").innerHTML = m;
+    document.querySelectorAll("[data-del]").forEach(function (b) { b.onclick = function () { L.splice(+b.dataset.del, 1); render(); }; });
+  }
+  function parse(a) { var k = a.split(":"); return { t: k[0], n: k[1] ? +k[1] : 0 }; }
+  function preset(a) { L = a.map(parse); render(); }
+  document.querySelectorAll("[data-add]").forEach(function (b) { b.onclick = function () { L.push(parse(b.dataset.add)); render(); }; });
+  $("p1").onclick = function () { preset(["conv:16", "pool", "conv:32", "pool", "conv:64", "pool", "flat", "dense:64", "dense:5"]); };
+  $("p2").onclick = function () { preset(["conv:16", "pool", "conv:32", "pool", "flat", "dense:64", "dense:5"]); };
+  $("p3").onclick = function () { preset(["flat", "dense:64", "dense:5"]); };
+  $("clr").onclick = function () { preset([]); };
+  $("p1").onclick();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>

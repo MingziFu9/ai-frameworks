@@ -58,6 +58,7 @@ nav:
     - "模型是怎样“看”图的": sims/model-top5/index.md
     - "数据增强预览": sims/augment-preview/index.md
     - "图片变数字": sims/image-to-numbers/index.md
+    - "搭积木：网络结构表": sims/layer-blocks/index.md
   - 学习图谱: learning-graph/index.md
   - 常见问题: faq/index.md
   - 附录:
