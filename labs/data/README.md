@@ -9,7 +9,7 @@
 | `detect_photos/` | 含多个物体的原图（未缩放），用于检测和分割 | 4 张 | 同上，作者见 LICENSE.txt | 第 8 章 |
 | `ocr_samples/` | 花店告示、采购单、小票三张文字图片 | 3 张 | 教材编写（`make_ocr_samples.py` 生成），内容为虚构 | 第 8 章 |
 | `reviews/reviews.csv` | 外卖评论，列为 text、label（1 好评 / 0 差评） | 1600 条 | 教材编写（`make_reviews.py` 生成，种子 42），内容为虚构 | 第 9 章 |
-| `speech_commands_small/` | 8 个英文指令词（down go left no right stop up yes）的 1 秒录音，16 kHz | 800 条（每类 100），13 MB | Google Speech Commands 子集 mini_speech_commands，CC BY 4.0，见 LICENSE.txt | 第 10 章 |
+| `speech_commands_small/` | 8 个英文指令词（down go left no right stop up yes）的 1 秒录音，编者转成了 8 kHz | 800 条（每类 100），13 MB | Google Speech Commands 子集 mini_speech_commands，CC BY 4.0，见 LICENSE.txt | 第 10 章 |
 | `service_records/records.txt` | 5 条客服记录，含姓名、手机号、身份证号等，用来练习脱敏 | 5 条 | 教材编写，内容为虚构；证件号用不存在的地区码 990101 | 第 12 章 |
 
 编者用来生成这些文件的脚本也放在这里（`make_datasets.py`、`make_ocr_samples.py`、`make_reviews.py`），学生不需要运行。
