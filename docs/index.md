@@ -48,7 +48,7 @@
 | [第 12 章](chapters/12-ecosystem/index.md) | 0.6 万 | 3 | 20（16） | 6 | 10 | 1 |
 | **合计** | **6.9 万** | **36** | **240（192）** | **101** | **92** | **14** |
 
-正文字数只统计汉字，不含代码和课后练习；单选、多选和判断题可以在网页上直接作答。配套学习资源：[交互动画](sims/index.md) 14 个 · [学习图谱](learning-graph/index.md) 2 个概念 · [常见问题](faq/index.md) 2 问 · [术语表](appendix/glossary.md) 101 条。
+正文字数只统计汉字，不含代码和课后练习；单选、多选和判断题可以在网页上直接作答。配套学习资源：[交互动画](sims/index.md) 14 个 · [学习图谱](learning-graph/index.md) 101 个概念 · [常见问题](faq/index.md) 20 问 · [术语表](appendix/glossary.md) 101 条。
 
 <!-- stats:end -->
 
