@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>数据增强预览</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+.ctl { display:grid; grid-template-columns:7.5em 1fr 4.5em; gap:6px; align-items:center; font-size:13px; margin:3px 0; }
+.ctl .v { text-align:right; font-variant-numeric:tabular-nums; color:var(--muted); }
+.cells { max-width:640px; display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px; }
+.cell { position:relative; aspect-ratio:1; overflow:hidden; border-radius:6px; border:1px solid var(--line); background:#000; }
+.cell img { width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s, filter .25s; }
+.cell span { position:absolute; left:4px; top:2px; font-size:11px; color:#fff; text-shadow:0 0 3px #000; }
+.cell.orig { border:2px solid var(--accent); }
+</style>
+</head>
+<body>
+<h1>数据增强预览</h1>
+<div class="sub">数据增强：训练时把同一张照片随机翻转、旋转、放大、调亮暗，让模型“见过”更多样子。拖动滑块设定变化的最大幅度，点“再随机一次”看 7 种结果。</div>
+<div class="row ex"><span class="lbl">换图：</span>
+  <button data-img="tulips_2.jpg" class="on">郁金香</button><button data-img="daisy_2.jpg">雏菊</button><button data-img="roses_2.jpg">玫瑰</button>
+</div>
+<div class="ctl"><label><input type="checkbox" id="flip" checked> 左右翻转</label><span class="lbl" style="color:var(--muted)">每次 50% 的机会翻转</span><span></span></div>
+<div class="ctl"><span>旋转最多</span><input type="range" id="rot" min="0" max="180" value="20"><span class="v" id="rotv"></span></div>
+<div class="ctl"><span>放大最多</span><input type="range" id="zoom" min="0" max="60" value="20"><span class="v" id="zoomv"></span></div>
+<div class="ctl"><span>亮度变化最多</span><input type="range" id="bri" min="0" max="80" value="20"><span class="v" id="briv"></span></div>
+<div class="row"><button class="main" id="again">再随机一次</button><button id="crazy">试试“过头”的设置</button><button id="reset">恢复推荐设置</button></div>
+<div class="cells" id="cells"></div>
+<div class="msg" id="msg"></div>
+<div class="note">示意动画，用浏览器的图片变换模拟，效果和实验 3-3 中 Keras 的 RandomFlip / RandomRotation / RandomZoom、飞桨的 RandomHorizontalFlip / RandomRotation 相近。照片来自 TensorFlow 花卉数据集，CC BY 2.0。</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, name = "tulips_2.jpg";
+  function rnd(a) { return (Math.random() * 2 - 1) * a; }
+  function render() {
+    var R = +$("rot").value, Z = +$("zoom").value, B = +$("bri").value;
+    $("rotv").textContent = "±" + R + "°"; $("zoomv").textContent = Z + "%"; $("briv").textContent = "±" + B + "%";
+    var h = '<div class="cell orig"><img src="img/' + name + '" alt="原图"><span>原图</span></div>';
+    for (var i = 1; i <= 7; i++) {
+      var f = $("flip").checked && Math.random() < 0.5 ? -1 : 1, s = 1 + Math.random() * Z / 100;
+      var t = "scale(" + (f * s).toFixed(2) + "," + s.toFixed(2) + ") rotate(" + (rnd(R) * f).toFixed(0) + "deg)";
+      h += '<div class="cell"><img src="img/' + name + '" style="transform:' + t + ';filter:brightness(' + (1 + rnd(B) / 100).toFixed(2) + ')" alt="增强结果 ' + i + '"><span>' + i + (f < 0 ? " 翻转" : "") + '</span></div>';
+    }
+    $("cells").innerHTML = h;
+    var m = "";
+    if (R > 90 || B > 50 || Z > 45) m = '<b class="bad">变化太大了：</b>花被转到倒立、亮得发白或只剩一小块，已经不像真实拍到的照片，反而会把模型教糊涂。增强要“像真的”。';
+    else if (R === 0 && Z === 0 && B === 0 && !$("flip").checked) m = "所有变化都关掉了，每张都和原图一样，等于没有增强。";
+    else m = '<b class="ok">合适：</b>每张看起来都还是这些花，只是像换了个角度、远近和光线重新拍了一次。';
+    $("msg").innerHTML = m;
+  }
+  ["rot", "zoom", "bri"].forEach(function (k) { $(k).oninput = render; });
+  $("flip").onchange = render; $("again").onclick = render;
+  $("crazy").onclick = function () { $("rot").value = 180; $("zoom").value = 60; $("bri").value = 80; render(); };
+  $("reset").onclick = function () { $("rot").value = 20; $("zoom").value = 20; $("bri").value = 20; $("flip").checked = true; render(); };
+  document.querySelectorAll("[data-img]").forEach(function (b) { b.onclick = function () {
+    document.querySelectorAll("[data-img]").forEach(function (x) { x.classList.remove("on"); }); b.classList.add("on"); name = b.dataset.img; render(); }; });
+  render();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>
