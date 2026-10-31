@@ -1,8 +1,8 @@
 # 站点名、描述、网址和 nav 由 python tools/course.py sync 根据 course.yml 生成，请改 course.yml，不要手改这几项
-site_name: 课程名称
-site_description: 面向成人教育人工智能技术应用专业（专科）的《课程名称》教材，每章配套动手实验
-site_url: https://mingzifu9.github.io/ai-textbook-template/
-repo_url: https://github.com/MingziFu9/ai-textbook-template
+site_name: 人工智能开发框架技术
+site_description: 面向成人教育人工智能技术应用专业（专科）零基础学生的《人工智能开发框架技术》教材，通用版（Keras）与国产版（飞桨）两套代码，每章配套动手实验
+site_url: https://mingzifu9.github.io/ai-frameworks/
+repo_url: https://github.com/MingziFu9/ai-frameworks
 docs_dir: docs
 theme:
   name: material
@@ -11,12 +11,15 @@ theme:
     - navigation.sections
     - navigation.top
     - content.code.copy
+    - content.tabs.link
 markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
   - abbr
   - pymdownx.details
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.highlight
   - pymdownx.superfences:
       custom_fences:
@@ -37,15 +40,27 @@ extra_javascript:
 nav:
   - 首页: index.md
   - 课程描述: course-description.md
-  - "第 1 章 示例章": chapters/01-sample/index.md
+  - "第 1 章 认识人工智能开发框架": chapters/01-intro/index.md
+  - "第 2 章 第一次用框架：调用现成模型": chapters/02-pretrained/index.md
+  - "第 3 章 数据在框架里的样子": chapters/03-data/index.md
+  - "第 4 章 搭积木：构建神经网络": chapters/04-build-network/index.md
+  - "第 5 章 训练模型：fit 背后发生了什么": chapters/05-training/index.md
+  - "第 6 章 看懂训练曲线，学会调参": chapters/06-tuning/index.md
+  - "第 7 章 迁移学习：站在别人的肩膀上": chapters/07-transfer/index.md
+  - "第 8 章 图像应用：检测与文字识别": chapters/08-image-apps/index.md
+  - "第 9 章 文本应用：让模型读懂文字": chapters/09-text-apps/index.md
+  - "第 10 章 语音应用：让模型听懂声音": chapters/10-speech-apps/index.md
+  - "第 11 章 把模型做成应用": chapters/11-deploy/index.md
+  - "第 12 章 国产 AI 生态、数据安全与综合项目": chapters/12-ecosystem/index.md
   - 交互动画:
     - sims/index.md
-    - "示例动画：点击计数器": sims/example-counter/index.md
+    - "CPU 与 GPU 谁算得快": sims/cpu-gpu-race/index.md
   - 学习图谱: learning-graph/index.md
   - 常见问题: faq/index.md
-  - 证书考点对照: certificate.md
   - 附录:
-    - "附录 A Python 速查": appendix/a-python.md
-    - "附录 B 工具库速查": appendix/b-libraries.md
+    - "附录 A 零基础 Python 入门": appendix/a-python.md
+    - "附录 B 通用版与国产版代码对照": appendix/b-libraries.md
     - "附录 C 实验环境与数据说明": appendix/c-environment.md
     - "附录 D 术语表": appendix/glossary.md
+    - "附录 E 实验报告模板与综合项目指南": appendix/e-project.md
+    - "附录 F 期末模拟卷": appendix/f-mock-exam.md

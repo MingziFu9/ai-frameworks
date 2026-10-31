@@ -86,8 +86,8 @@ def convert(md, page="index.md"):
     md = re.sub(r"<span id=\"[^\"]*\"></span>", "", md)
     md = re.sub(r"^</?div[^>]*>\s*$", "", md, flags=re.M)
     # 术语链接、站内链接只留文字
-    md = re.sub(r"\[([^\]]+)\]\((?!https?:)[^)]*\)", r"\1", md)
-    md = re.sub(r"\{ *[.#:a-z][^}]*\}", "", md)
+    md = re.sub(r'\[([^\]]+)\]\((?!https?:)[^)\s]*(?: "[^"]*")?\)', r"\1", md)   # 链接标题（术语提示）里可能有括号
+    md = re.sub(r"\{ (?:[.#]|[a-z_]+=)[^}]*\}", "", md)                    # 只去掉 { .term }、{ #121 }、{ target=_blank } 这类属性，保留公式和代码里的花括号
     # 提示框：!!! / ??? 类型 "标题" + 缩进正文 → 引用块
     lines, out, i = md.split("\n"), [], 0
     while i < len(lines):

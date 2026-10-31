@@ -148,7 +148,7 @@ def lab_titles(ch, c):
     p = chapter_path(ch)
     if not p.exists():
         return []
-    return re.findall(rf"^### ({c['lab_word']} \d+-\d+ .+)$", p.read_text(encoding="utf-8"), re.M)
+    return [re.sub(r"\s*\{ *#[^}]*\}$", "", t) for t in re.findall(rf"^### ({c['lab_word']} \d+-\d+ .+)$", p.read_text(encoding="utf-8"), re.M)]
 
 
 def sync_index(c):

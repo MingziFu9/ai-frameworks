@@ -7,41 +7,47 @@
 # 也从这里读取课程名、学时等信息
 # ============================================================
 
-title: 课程名称                      # 书名，例如：机器学习
-description: 面向成人教育人工智能技术应用专业（专科）的《课程名称》教材，每章配套动手实验
-audience: 成人教育（继续教育）人工智能技术应用专业专科学生，多为在职学习者
-github_user: MingziFu9                # 网址 https://<github_user>.github.io/<repo>/
-repo: ai-textbook-template            # GitHub 仓库名（用模板新建后改成本课的，如 ml-textbook）
+title: 人工智能开发框架技术
+description: 面向成人教育人工智能技术应用专业（专科）零基础学生的《人工智能开发框架技术》教材，通用版（Keras）与国产版（飞桨）两套代码，每章配套动手实验
+audience: 成人教育（开放教育）人工智能技术应用专业专科学生，多为在职学习者，Python 零基础
+github_user: MingziFu9
+repo: ai-frameworks
 
-credits: 4                            # 学分
-hours: {theory: 60, lab: 12}          # 学时：理论 + 实验
-semester: 3                           # 开课学期
-exam: 闭卷                            # 期末考核方式
-labs_per_chapter: 3                   # 每章实验数；0 表示没有实验
-lab_section: 本章实验                 # 实验部分的二级标题；导论用“在线体验”
-lab_word: 实验                        # 每个实验的三级标题前缀（### 实验 N-M）；导论用“体验”
-frontier_title: 前沿视窗              # 每章“前沿”小节的名称，导论用“身边的 AI”
-certificates:                         # 对应的职业证书；没有证书的课程写成 certificates: []，导航里就不显示“证书考点对照”页
-  - name: 证书名称（级别）
-    issuer: 发证机构，标准或考纲名称（年份）
+credits: 4
+hours: {theory: 60, lab: 12}
+semester: 4
+exam: 开卷
+labs_per_chapter: 3
+lab_section: 本章实验
+lab_word: 实验
+frontier_title: 前沿视窗
+certificates: []
 
-# 章节：dir 是 docs/chapters/ 下的文件夹名（两位章号开头），short 用于学习图谱等窄处
-# theory / lab 是本章学时；labs 可单独覆盖本章实验数；offline 可指定本章线下学时（不写则按 online_ratio 分）
 chapters:
-  - {dir: 01-sample, title: 示例章, short: 示例章, theory: 5, lab: 1}
+  - {dir: 01-intro, title: 认识人工智能开发框架, short: 认识框架, theory: 4, lab: 1, offline: 1}
+  - {dir: 02-pretrained, title: 第一次用框架：调用现成模型, short: 调用现成模型, theory: 4, lab: 1, offline: 1}
+  - {dir: 03-data, title: 数据在框架里的样子, short: 数据与张量, theory: 5, lab: 1, offline: 1}
+  - {dir: 04-build-network, title: 搭积木：构建神经网络, short: 搭建网络, theory: 5, lab: 1, offline: 1}
+  - {dir: 05-training, title: 训练模型：fit 背后发生了什么, short: 训练模型, theory: 6, lab: 1, offline: 1}
+  - {dir: 06-tuning, title: 看懂训练曲线，学会调参, short: 训练曲线与调参, theory: 5, lab: 1, offline: 1}
+  - {dir: 07-transfer, title: 迁移学习：站在别人的肩膀上, short: 迁移学习, theory: 5, lab: 1, offline: 1}
+  - {dir: 08-image-apps, title: 图像应用：检测与文字识别, short: 图像应用, theory: 5, lab: 1, offline: 1}
+  - {dir: 09-text-apps, title: 文本应用：让模型读懂文字, short: 文本应用, theory: 5, lab: 1, offline: 1}
+  - {dir: 10-speech-apps, title: 语音应用：让模型听懂声音, short: 语音应用, theory: 5, lab: 1, offline: 1}
+  - {dir: 11-deploy, title: 把模型做成应用, short: 模型部署, theory: 6, lab: 1, offline: 2}
+  - {dir: 12-ecosystem, title: 国产 AI 生态、数据安全与综合项目, short: 生态与安全, theory: 5, lab: 1, offline: 2}
 
-# 其他页面：追加在导航“常见问题”之后，如 extra_pages: [{file: mock-exam.md, title: 在线模拟卷}]
 extra_pages: []
 
-# 附录：docs/appendix/ 下的文件，按顺序自动编号为 A、B、C……（术语表固定为 glossary.md）
 appendices:
-  - {file: a-python.md, title: Python 速查}
-  - {file: b-libraries.md, title: 工具库速查}
+  - {file: a-python.md, title: 零基础 Python 入门}
+  - {file: b-libraries.md, title: 通用版与国产版代码对照}
   - {file: c-environment.md, title: 实验环境与数据说明}
   - {file: glossary.md, title: 术语表}
+  - {file: e-project.md, title: 实验报告模板与综合项目指南}
+  - {file: f-mock-exam.md, title: 期末模拟卷}
 
-# 教案默认设置（每章可在 lesson-plans/chNN.yml 里覆盖）
 lesson_plan:
-  online_ratio: 0.5                   # 线上学时占比（开放大学以线上为主，按实际改）
-  teacher: ""                         # 授课教师，留空则教案上留出填写位置
-  school: ""                          # 学校名称，留空则不显示
+  online_ratio: 0.5
+  teacher: ""
+  school: ""

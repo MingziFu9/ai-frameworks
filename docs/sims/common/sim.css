@@ -32,3 +32,4 @@ table.t th { background:#f5f7fa; font-weight:600; }
 .barrow .v { text-align:right; color:var(--muted); font-variant-numeric:tabular-nums; }
 code, .mono { font-family:"JetBrains Mono",Consolas,monospace; font-size:12.5px; }
 svg text { font-family:inherit; }
+[hidden] { display:none !important; }

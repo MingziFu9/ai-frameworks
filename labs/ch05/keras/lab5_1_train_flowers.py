@@ -1,0 +1,43 @@
+# 实验 5-1（通用版）训练第一个花卉识别模型
+# %% 第 1 步：导入工具，读入数据
+import keras                       # 导入 Keras 框架
+from keras import layers           # layers 里放着各种“积木”（层）
+
+DATA = "../../data/flowers_small"  # ← 改这里：数据文件夹的位置
+keras.utils.set_random_seed(42)    # 固定随机种子，让每次结果一样
+train_ds, val_ds = keras.utils.image_dataset_from_directory(
+    DATA, validation_split=0.2, subset="both", seed=42,
+    image_size=(128, 128), batch_size=32)   # 80% 训练，20% 验证
+class_names = train_ds.class_names
+print("类别：", class_names)
+
+# %% 第 2 步：搭网络（和第 4 章一样）
+model = keras.Sequential([
+    keras.Input(shape=(128, 128, 3)),        # 输入：128×128 的彩色图片
+    layers.Rescaling(1 / 255),               # 把 0～255 缩到 0～1
+    layers.Conv2D(16, 3, activation="relu"), # 卷积层：找简单的纹理
+    layers.MaxPooling2D(),                   # 池化层：缩小一半
+    layers.Conv2D(32, 3, activation="relu"),
+    layers.MaxPooling2D(),
+    layers.Conv2D(64, 3, activation="relu"),
+    layers.MaxPooling2D(),
+    layers.Flatten(),                        # 展平成一长串数字
+    layers.Dense(64, activation="relu"),     # 全连接层
+    layers.Dense(5, activation="softmax"),   # 输出层：5 种花的概率
+])
+
+# %% 第 3 步：训练前的三项设置
+model.compile(
+    loss="sparse_categorical_crossentropy",  # 损失函数：衡量答案和标准答案差多少
+    optimizer=keras.optimizers.Adam(learning_rate=0.001),  # ← 改这里：学习率
+    metrics=["accuracy"])                    # 评价指标：准确率
+
+# %% 第 4 步：开始训练
+history = model.fit(train_ds, validation_data=val_ds, epochs=10, verbose=2)  # ← 改这里：轮次
+
+# %% 第 5 步：保存模型，用它预测一张新照片
+model.save("flowers_cnn.keras")
+img = keras.utils.load_img("../../data/test_photos/roses_1.jpg", target_size=(128, 128))
+x = keras.ops.expand_dims(keras.utils.img_to_array(img), 0)   # 变成“一批只有一张”的形状
+prob = model.predict(x, verbose=0)[0]
+print("预测：", class_names[prob.argmax()], f"（把握 {prob.max():.1%}）")

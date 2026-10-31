@@ -1,9 +1,9 @@
 ---
-title: 附录 A Python 速查
+title: 附录 A 零基础 Python 入门
 description: 本书实验中常用的 Python 基础语法、文件读写、正则表达式、NumPy 与 pandas 操作速查
 ---
 
-# 附录 A Python 速查
+# 附录 A 零基础 Python 入门
 
 本附录汇总了本书实验中最常用的 Python 知识点，供同学们在做实验时随时查阅。它不是完整的 Python 教程，如果你还没有学过 Python，建议先学习一门 Python 程序设计入门课程。
 

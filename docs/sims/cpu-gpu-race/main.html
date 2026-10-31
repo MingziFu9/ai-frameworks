@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CPU 与 GPU 谁算得快</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+.lane { border:1px solid var(--line); border-radius:8px; padding:8px 10px; margin-top:8px; }
+.lane h2 { font-size:13.5px; margin:0 0 4px; }
+.cores { display:flex; flex-wrap:wrap; gap:2px; margin:4px 0 6px; }
+.core { background:#eceff1; border-radius:2px; transition:background .15s; }
+.core.big { width:38px; height:38px; border-radius:6px; }
+.core.small { width:7px; height:7px; }
+.core.busy { background:var(--accent); }
+.track { height:14px; background:#eceff1; border-radius:3px; overflow:hidden; }
+.fill { height:100%; width:0; background:var(--accent); }
+.fill.ov { background:var(--warn); }
+.res { font-variant-numeric:tabular-nums; font-size:13px; margin-top:4px; }
+</style>
+</head>
+<body>
+<h1>CPU 与 GPU 谁算得快</h1>
+<div class="sub">拖动“计算量”，点“开始比赛”。CPU 有 4 个能干的大核心，GPU 有 1000 个只会做简单加法的小核心，但开工前要先把数据搬上显卡（橙色）。示意动画，耗时按简化模型计算。</div>
+<div class="row">
+  <span>计算量</span>
+  <input type="range" id="n" min="0" max="100" value="50">
+  <span class="big mono" id="nv"></span>
+</div>
+<div class="row">
+  <button class="main" id="go">开始比赛</button>
+  <button data-v="10">很少（100 道题）</button>
+  <button data-v="50">中等</button>
+  <button data-v="95">很多（约 63 万道题）</button>
+</div>
+<div class="lane">
+  <h2>CPU：4 个大核心，每个核心每毫秒做 10 道题</h2>
+  <div class="cores" id="cpuCores"></div>
+  <div class="track"><div class="fill" id="cpuFill"></div></div>
+  <div class="res" id="cpuRes">用时：—</div>
+</div>
+<div class="lane">
+  <h2>GPU：1000 个小核心，每个核心每毫秒做 1 道题，开工前搬数据 50 毫秒</h2>
+  <div class="cores" id="gpuCores"></div>
+  <div class="track"><div class="fill" id="gpuFill"></div></div>
+  <div class="res" id="gpuRes">用时：—</div>
+</div>
+<div class="msg" id="msg"></div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var cpu = $("cpuCores"), gpu = $("gpuCores"), i;
+  for (i = 0; i < 4; i++) cpu.insertAdjacentHTML("beforeend", '<div class="core big"></div>');
+  for (i = 0; i < 400; i++) gpu.insertAdjacentHTML("beforeend", '<div class="core small"></div>');
+  function tasks() { return Math.round(Math.pow(10, 2 + 4 * $("n").value / 100)); }   // 100 ～ 100 万
+  function fmt(x) { return x >= 10000 ? (x / 10000).toFixed(x >= 100000 ? 0 : 1) + " 万" : String(x); }
+  function show() { $("nv").textContent = fmt(tasks()) + " 道题"; }
+  var timer = null;
+  function race() {
+    var N = tasks(), tc = N / 40, tg = 50 + N / 1000, T = Math.max(tc, tg);
+    var start = performance.now(), dur = 2500;
+    $("msg").textContent = "";
+    if (timer) cancelAnimationFrame(timer);
+    function frame(now) {
+      var t = Math.min(1, (now - start) / dur) * T;        // 模拟时间（毫秒）
+      var pc = Math.min(1, t / tc);
+      $("cpuFill").style.width = pc * 100 + "%";
+      cpu.querySelectorAll(".core").forEach(function (c) { c.classList.toggle("busy", pc < 1 && t > 0); });
+      var ov = t < 50, pg = ov ? 0 : Math.min(1, (t - 50) / (tg - 50));
+      $("gpuFill").className = "fill" + (ov ? " ov" : "");
+      $("gpuFill").style.width = (ov ? t / tg : 50 / tg + pg * (1 - 50 / tg)) * 100 + "%";
+      gpu.querySelectorAll(".core").forEach(function (c) { c.classList.toggle("busy", !ov && pg < 1); });
+      $("cpuRes").textContent = "用时：" + (pc < 1 ? "计算中…" : tc.toFixed(1) + " 毫秒");
+      $("gpuRes").textContent = "用时：" + (ov ? "搬数据中…" : pg < 1 ? "计算中…" : tg.toFixed(1) + " 毫秒");
+      if (t < T) { timer = requestAnimationFrame(frame); return; }
+      var win = tc < tg ? "CPU" : "GPU", r = tc < tg ? tg / tc : tc / tg;
+      $("msg").innerHTML = '<b class="ok">' + win + " 赢了</b>，快了约 " + r.toFixed(1) + " 倍。" +
+        (win === "CPU" ? "题太少，GPU 搬数据的时间占了大头。" : "题越多，1000 个核心一起干的优势越明显。");
+    }
+    timer = requestAnimationFrame(frame);
+  }
+  $("n").oninput = show;
+  $("go").onclick = race;
+  document.querySelectorAll("button[data-v]").forEach(function (b) {
+    b.onclick = function () { $("n").value = b.dataset.v; show(); race(); };
+  });
+  show();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>
