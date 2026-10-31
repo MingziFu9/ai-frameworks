@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>学习率大小的影响</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+svg { width:100%; max-width:640px; height:auto; border:1px solid var(--line); border-radius:8px; display:block; }
+.legend { font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<h1>学习率大小的影响</h1>
+<div class="sub">把训练想象成蒙着眼睛下山：脚下哪边低就往哪边走一步，山谷最低点就是损失最小的地方。学习率决定每一步迈多大。拖动滑块，点“走 15 步”。</div>
+<div class="row"><span>学习率</span><input type="range" id="lr" min="0" max="100" value="62"><span class="big mono" id="lrv"></span></div>
+<div class="row"><button class="main" id="go">走 15 步</button><button data-v="19">太小</button><button data-v="62">合适</button><button data-v="89">偏大</button><button data-v="96">太大</button></div>
+<svg id="sv" viewBox="0 0 640 300"></svg>
+<div class="msg" id="msg"></div>
+<div class="note">示意动画：横轴是某一个参数的取值，纵轴是损失，曲线为 损失 = (参数 − 3)² ÷ 2 + 0.3。每一步按“参数 ← 参数 − 学习率 × 坡度”更新，这正是第 ⑤ 步做的事。</div>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); }, W0 = -3, timer = null;
+  function f(w) { return (w - 3) * (w - 3) / 2 + 0.3; }
+  function g(w) { return w - 3; }
+  function lrOf(v) { return +(0.02 * Math.pow(2.6 / 0.02, v / 100)).toFixed(3); }
+  function X(w) { return 40 + (w + 9) / 24 * 580; } function Y(l) { return 280 - l / 75 * 260; }
+  function base() {
+    var d = "M"; for (var w = -9; w <= 15; w += 0.1) { var l = f(w); if (l <= 75) d += X(w).toFixed(1) + "," + Y(l).toFixed(1) + " L"; }
+    return '<path d="' + d.slice(0, -2) + '" fill="none" stroke="#90a4ae" stroke-width="2"/>' +
+      '<line x1="' + X(3) + '" y1="20" x2="' + X(3) + '" y2="285" stroke="#43a047" stroke-dasharray="4 4"/><text x="' + (X(3) + 4) + '" y="34" fill="#43a047" font-size="12">最低点</text>' +
+      '<text x="600" y="296" font-size="11" fill="#78909c">参数</text><text x="6" y="16" font-size="11" fill="#78909c">损失</text>';
+  }
+  function run() {
+    if (timer) clearInterval(timer);
+    var lr = lrOf(+$("lr").value), path = [W0];
+    for (var i = 0; i < 15; i++) path.push(path[i] - lr * g(path[i]));
+    var k = 0;
+    timer = setInterval(function () {
+      k++;
+      var h = base(), pts = [];
+      for (var i = 0; i <= k; i++) { var w = Math.max(-9, Math.min(15, path[i])), l = Math.min(75, f(path[i])); pts.push(X(w).toFixed(1) + "," + Y(l).toFixed(1)); }
+      h += '<polyline points="' + pts.join(" ") + '" fill="none" stroke="#3f51b5" stroke-width="1.5" stroke-dasharray="3 3"/>';
+      pts.forEach(function (p, i) { var c = p.split(","); h += '<circle cx="' + c[0] + '" cy="' + c[1] + '" r="' + (i === k ? 7 : 3) + '" fill="' + (i === k ? "#ef6c00" : "#3f51b5") + '"/>'; });
+      $("sv").innerHTML = h;
+      if (k >= 15) { clearInterval(timer); timer = null; verdict(lr, path); }
+    }, 140);
+  }
+  function verdict(lr, path) {
+    var end = path[15], m, loss = f(end);
+    if (!isFinite(end) || Math.abs(end - 3) > 20) m = '<b class="bad">越走越远：</b>步子太大，每一步都跨过了谷底、落到更高的对面山坡上，损失越来越大，训练“炸了”。实验 5-3 中学习率 0.1 时，第 1 轮损失高达 308，之后准确率只有 19%，就是这种情况。';
+    else if (Math.abs(end - 3) > 1.5 && lr < 1) m = '<b class="bad">走得太慢：</b>15 步后离谷底还很远（损失 ' + loss.toFixed(2) + '）。学习率太小，要训练很多很多轮才能学好。实验 5-3 中学习率 0.00001 时，10 轮后准确率只有 36%。';
+    else if (lr > 1.2) m = '<b>来回晃：</b>步子偏大，在谷底两边来回跳，最后也到了谷底附近（损失 ' + loss.toFixed(2) + '），但走得很不稳。';
+    else m = '<b class="ok">合适：</b>一步步稳稳走到谷底附近，损失降到 ' + loss.toFixed(2) + '。实际训练常用 0.001 左右的学习率（Adam 优化器的默认值）。';
+    $("msg").innerHTML = m;
+  }
+  function show() { $("lrv").textContent = lrOf(+$("lr").value); $("sv").innerHTML = base() + '<circle cx="' + X(W0) + '" cy="' + Y(f(W0)) + '" r="7" fill="#ef6c00"/>'; $("msg").innerHTML = "橙色小球是起点。"; }
+  $("lr").oninput = show; $("go").onclick = run;
+  document.querySelectorAll("[data-v]").forEach(function (b) { b.onclick = function () { $("lr").value = b.dataset.v; show(); run(); }; });
+  show();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>

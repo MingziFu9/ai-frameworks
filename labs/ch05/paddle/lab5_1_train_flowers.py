@@ -20,22 +20,23 @@ net = nn.Sequential(
     nn.Conv2D(32, 64, 3), nn.ReLU(), nn.MaxPool2D(2),
     nn.Flatten(),                                      # 展平成一长串数字
     nn.Linear(64 * 14 * 14, 64), nn.ReLU(),            # 全连接层
-    nn.Linear(64, 5))                                  # 输出层：5 种花各一个分数
+    nn.Linear(64, 5), nn.Softmax())                    # 输出层：5 种花各一个概率
 model = paddle.Model(net)                              # 套上高层 API 的“外壳”
 
 # %% 第 3 步：训练前的三项设置
 model.prepare(
     optimizer=paddle.optimizer.Adam(learning_rate=0.001,       # ← 改这里：学习率
                                     parameters=model.parameters()),
-    loss=nn.CrossEntropyLoss(),                 # 损失函数：衡量答案和标准答案差多少
+    loss=nn.CrossEntropyLoss(use_softmax=False),  # 损失函数：衡量答案和标准答案差多少
     metrics=paddle.metric.Accuracy())           # 评价指标：准确率
 
 # %% 第 4 步：开始训练
-model.fit(train_ds, val_ds, epochs=10, batch_size=32, shuffle=True, verbose=2)  # ← 改这里：轮次
+model.fit(train_ds, val_ds, epochs=10, batch_size=32, shuffle=True,
+          verbose=1, log_freq=100)              # ← 改这里：轮次 epochs；log_freq 让每轮只显示一行
 
 # %% 第 5 步：保存模型，用它预测一张新照片
 model.save("flowers_cnn")                       # 保存为 flowers_cnn.pdparams 等文件
 from PIL import Image
 x = tf(Image.open("../../data/test_photos/roses_1.jpg").convert("RGB")).unsqueeze(0)  # 一批只有一张
-prob = nn.functional.softmax(net(x))[0].numpy() # 分数变成概率
+prob = net(x)[0].numpy()                        # 5 种花的概率
 print("预测：", class_names[prob.argmax()], f"（把握 {prob.max():.1%}）")

@@ -84,6 +84,13 @@ description: 本书主要术语的中英文名称、简明定义和例子，按�
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-损失函数"></span>损失函数 | Loss Function | 衡量模型的预测和标准答案相差多少的计算方法，算出的数叫损失，越小越好 | 分类用交叉熵；五选一瞎猜时损失约 1.61 |
+| <span id="g-优化器"></span>优化器 | Optimizer | 根据损失调整模型参数的方法；常用的有 SGD、Adam | `keras.optimizers.Adam(learning_rate=0.001)` |
+| <span id="g-准确率"></span>准确率 | Accuracy | 预测正确的样本数占全部样本数的比例 | 150 张验证照片认对 82 张，准确率约 54.7% |
+| <span id="g-轮次"></span>轮次 | Epoch | 把整个训练集从头到尾学一遍叫一轮；epochs 设定一共学几轮 | `epochs=10`，600 张照片学 10 遍 |
+| <span id="g-反向传播"></span>反向传播 | Backpropagation | 从损失出发、从输出层往输入层逐层倒推，算出每个参数的梯度的方法 | `loss.backward()` |
+| <span id="g-梯度"></span>梯度 | Gradient | 每个参数该往哪个方向改、改多少才能让损失变小的指示，由反向传播算出 | 梯度为正，说明这个参数应该调小 |
+| <span id="g-学习率"></span>学习率 | Learning Rate | 每次更新参数时迈出的步子大小，太大学不稳，太小学得慢 | Adam 的默认学习率 0.001 |
 
 ## 第 6 章 看懂训练曲线，学会调参
 

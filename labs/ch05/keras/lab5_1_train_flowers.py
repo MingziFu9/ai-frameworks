@@ -1,6 +1,7 @@
 # 实验 5-1（通用版）训练第一个花卉识别模型
 # %% 第 1 步：导入工具，读入数据
 import keras                       # 导入 Keras 框架
+import numpy as np                 # numpy：处理一大堆数字的工具
 from keras import layers           # layers 里放着各种“积木”（层）
 
 DATA = "../../data/flowers_small"  # ← 改这里：数据文件夹的位置
@@ -38,6 +39,6 @@ history = model.fit(train_ds, validation_data=val_ds, epochs=10, verbose=2)  # �
 # %% 第 5 步：保存模型，用它预测一张新照片
 model.save("flowers_cnn.keras")
 img = keras.utils.load_img("../../data/test_photos/roses_1.jpg", target_size=(128, 128))
-x = keras.ops.expand_dims(keras.utils.img_to_array(img), 0)   # 变成“一批只有一张”的形状
+x = np.expand_dims(keras.utils.img_to_array(img), 0)        # 变成“一批只有一张”的形状
 prob = model.predict(x, verbose=0)[0]
 print("预测：", class_names[prob.argmax()], f"（把握 {prob.max():.1%}）")

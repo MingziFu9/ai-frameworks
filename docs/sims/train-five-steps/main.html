@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>训练五步走</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+.steps { display:flex; flex-wrap:wrap; gap:4px; margin:6px 0; }
+.st { flex:1; min-width:96px; border:1px solid var(--line); border-radius:8px; padding:5px 6px; font-size:12.5px; text-align:center; color:var(--muted); transition:all .2s; }
+.st b { display:block; font-size:13.5px; color:var(--ink); }
+.st.on { border-color:var(--accent); background:var(--soft); color:var(--ink); box-shadow:0 0 0 2px var(--accent) inset; }
+.wrap { display:grid; grid-template-columns:150px 1fr 200px; gap:12px; align-items:start; margin-top:8px; }
+@media (max-width:640px) { .wrap { grid-template-columns:1fr; } }
+.wrap img { width:100%; border-radius:8px; border:1px solid var(--line); }
+.barrow { grid-template-columns:4.5em 1fr 3.8em; }
+.bar.t { background:var(--pos); }
+.delta { font-size:12px; color:var(--warn); min-width:2.5em; }
+svg { width:100%; height:120px; border:1px solid var(--line); border-radius:8px; }
+.explain { min-height:4.2em; }
+</style>
+</head>
+<body>
+<h1>训练五步走</h1>
+<div class="sub">用一张玫瑰照片演示 fit 每一批做的五件事。点“下一步”一步步看，或点“自动跑 20 批”。为了看得清楚，这里只调整网络最后输出的 5 个分数，真实训练会同时调整全部 83 万个参数。</div>
+<div class="steps" id="steps">
+  <div class="st"><b>① 前向计算</b>网络做题</div>
+  <div class="st"><b>② 计算损失</b>对答案</div>
+  <div class="st"><b>③ 清空梯度</b>擦掉旧意见</div>
+  <div class="st"><b>④ 反向传播</b>找出怎么改</div>
+  <div class="st"><b>⑤ 更新参数</b>改一小步</div>
+</div>
+<div class="row"><button class="main" id="next">下一步</button><button id="auto">自动跑 20 批</button><button id="reset">重来</button>
+  <span>学习率</span><select id="lr"><option value="0.3">0.3（合适）</option><option value="0.05">0.05（太小）</option><option value="3">3（太大）</option></select>
+  <span class="mono" id="batch"></span></div>
+<div class="wrap">
+  <div><img src="roses_1.jpg" alt="一张玫瑰照片"><div class="note">标准答案：<b>roses 玫瑰</b></div></div>
+  <div><div id="bars"></div><div class="msg explain" id="msg"></div></div>
+  <div><svg id="curve" viewBox="0 0 200 120" preserveAspectRatio="none"></svg><div class="note">每一批的损失（越低越好）</div></div>
+</div>
+<script>
+(function () {
+  var NAMES = ["daisy", "dandelion", "roses", "sunflowers", "tulips"], T = 2, $ = function (id) { return document.getElementById(id); };
+  var z, p, loss, grad, step, batch, hist, timer = null;
+  function softmax(v) { var m = Math.max.apply(null, v), e = v.map(function (x) { return Math.exp(x - m); }), s = e.reduce(function (a, b) { return a + b; }); return e.map(function (x) { return x / s; }); }
+  function reset() { z = [0.3, 0.1, -0.2, 0.25, 0.4]; p = softmax(z); grad = null; step = -1; batch = 0; hist = []; loss = null; stop(); draw(); $("msg").innerHTML = "点“下一步”开始第 1 批。网络还没训练，5 个分数是随便填的。"; }
+  function draw(showGrad) {
+    $("bars").innerHTML = NAMES.map(function (n, i) {
+      var d = showGrad && grad ? (grad[i] > 0 ? "↓ 调低" : "↑ 调高") : "";
+      return '<div class="barrow"><span class="mono">' + n + '</span><div><div class="bar' + (i === T ? " t" : "") + '" style="width:' + Math.max(1, p[i] * 100) + '%"></div></div><span class="v">' + (p[i] * 100).toFixed(1) + '%</span></div>' +
+        (d ? '<div class="delta" style="margin:-2px 0 2px 4.8em">' + d + "</div>" : "");
+    }).join("");
+    document.querySelectorAll(".st").forEach(function (e, k) { e.classList.toggle("on", k === step); });
+    $("batch").textContent = "第 " + Math.max(batch, 1) + " 批";
+    var max = Math.max(2, Math.max.apply(null, hist.concat([0]))), pts = hist.map(function (v, i) { return (i * 200 / 20).toFixed(1) + "," + (115 - v / max * 105).toFixed(1); }).join(" ");
+    $("curve").innerHTML = '<polyline points="' + pts + '" fill="none" stroke="#3f51b5" stroke-width="2" vector-effect="non-scaling-stroke"/>' +
+      hist.map(function (v, i) { return '<circle cx="' + (i * 10) + '" cy="' + (115 - v / max * 105) + '" r="2.5" fill="#3f51b5"/>'; }).join("");
+  }
+  function next() {
+    if (step === 4 || step === -1) { step = 0; batch++; } else step++;
+    var lr = +$("lr").value, m;
+    if (step === 0) { p = softmax(z); m = "<b>① 前向计算：</b>照片从第一层一路算到输出层，得到 5 种花的概率。现在“roses”只有 " + (p[T] * 100).toFixed(1) + "%。代码：<span class='mono'>pred = net(images)</span>"; }
+    else if (step === 1) { loss = -Math.log(p[T]); hist.push(loss); if (hist.length > 21) hist.shift(); m = "<b>② 计算损失：</b>对照标准答案“roses”，损失 = −ln(" + p[T].toFixed(3) + ") = <b>" + loss.toFixed(3) + "</b>。正确答案的概率越高，损失越小。代码：<span class='mono'>loss = loss_fn(pred, labels)</span>"; }
+    else if (step === 2) { grad = null; m = "<b>③ 清空梯度：</b>把上一批留下的“修改意见”擦掉，不然新旧意见会叠在一起。代码：<span class='mono'>opt.zero_grad()</span>（飞桨 <span class='mono'>opt.clear_grad()</span>）"; }
+    else if (step === 3) { grad = p.map(function (v, i) { return v - (i === T ? 1 : 0); }); m = "<b>④ 反向传播：</b>从损失往回算，得出每个参数该往哪边改：正确答案的分数要调高，其他调低。这组“修改意见”叫梯度。代码：<span class='mono'>loss.backward()</span>"; }
+    else { z = z.map(function (v, i) { return v - lr * grad[i]; }); p = softmax(z); m = "<b>⑤ 更新参数：</b>每个参数按意见改一小步，步子大小就是学习率 " + lr + "。改完后再算一遍，“roses”变成 " + (p[T] * 100).toFixed(1) + "%。代码：<span class='mono'>opt.step()</span>"; }
+    draw(step === 3 || step === 4); $("msg").innerHTML = m;
+  }
+  function stop() { if (timer) { clearInterval(timer); timer = null; $("auto").textContent = "自动跑 20 批"; } }
+  $("next").onclick = function () { stop(); next(); };
+  $("auto").onclick = function () {
+    if (timer) return stop();
+    var n = 0; $("auto").textContent = "停止";
+    timer = setInterval(function () { next(); if (step === 4 && ++n >= 20) stop(); }, 120);
+  };
+  $("reset").onclick = reset; $("lr").onchange = reset;
+  reset();
+})();
+</script>
+<script src="../common/sim.js"></script>
+</body>
+</html>

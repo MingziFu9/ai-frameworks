@@ -59,6 +59,8 @@ nav:
     - "数据增强预览": sims/augment-preview/index.md
     - "图片变数字": sims/image-to-numbers/index.md
     - "搭积木：网络结构表": sims/layer-blocks/index.md
+    - "学习率大小的影响": sims/learning-rate/index.md
+    - "训练五步走": sims/train-five-steps/index.md
   - 学习图谱: learning-graph/index.md
   - 常见问题: faq/index.md
   - 附录:
