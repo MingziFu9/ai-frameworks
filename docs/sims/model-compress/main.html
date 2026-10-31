@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>模型压缩</title>
+<link rel="stylesheet" href="../common/sim.css">
+<style>
+.barrow { grid-template-columns:7em 1fr 6.5em; max-width:640px; }
+.bar.size { background:var(--accent); } .bar.speed { background:var(--warn); } .bar.acc { background:var(--pos); }
+table.w { border-collapse:collapse; font-size:13px; margin-top:4px; }
+table.w td, table.w th { border:1px solid var(--line); padding:3px 6px; text-align:right; font-family:ui-monospace,Consolas,monospace; }
+table.w th { white-space:nowrap; background:#f5f5f5; font-family:inherit; font-weight:normal; color:var(--muted); }
+td.diff { color:var(--neg); }
+</style>
+</head>
+<body>
+<h1>模型压缩</h1>
+<div class="sub">选择每个参数用几位来存，看模型大小、速度、准确率怎么变，以及参数本身被“压缩”成了什么样。数据来自编者对第 7 章花卉迁移学习模型（MobileNetV2）的实测。</div>
+<div class="row" id="btns"></div>
+<div class="box" style="max-width:660px">
+  <h2>实测结果（ONNX Runtime，编者电脑 CPU，单张照片）</h2>
+  <div class="barrow"><span>文件大小</span><div><div class="bar size" id="b1"></div></div><span class="v" id="v1"></span></div>
+  <div class="barrow"><span>每张用时</span><div><div class="bar speed" id="b2"></div></div><span class="v" id="v2"></span></div>
+  <div class="barrow"><span>验证准确率</span><div><div class="bar acc" id="b3"></div></div><span class="v" id="v3"></span></div>
+</div>
+<div class="box" style="max-width:660px">
+  <h2>放大看：输出层的前 5 个参数</h2>
+  <div style="overflow-x:auto"><table class="w" id="tbl"></table></div>
+  <div class="note" id="how"></div>
+</div>
+<div class="msg" id="msg"></div>
+<div class="note">对比：Keras 原模型文件 9.7 MB，用 <code>model.predict</code> 预测一张约 65 毫秒（每次调用有固定的准备开销）；导出成 ONNX 后同一个模型约 1.1 毫秒。速度和电脑的 CPU 有关，你的结果可能不同。</div>
+<script src="../common/sim.js"></script>
+<script>
+(function () {
+  var W = [-0.07791510224342346, 0.012211092747747898, 0.10714004933834076, -0.01414381992071867, 0.0435522198677063];
+  var MAXABS = 0.14252116, $ = function (id) { return document.getElementById(id); };
+  var OPT = [
+    { k: "32 位小数（原模型）", size: 8.9, ms: 1.1, acc: 82.67, f: function (v) { return v; }, fmt: 8,
+      how: "每个参数用 32 位（4 个字节）的小数存，精确到小数点后七八位。",
+      msg: "这是原始模型，作为比较的基准。" },
+    { k: "16 位小数", size: 4.5, ms: 2.1, acc: 82.67, f: f16, fmt: 6,
+      how: "每个参数用 16 位（2 个字节）的小数存，只保留大约 3～4 位有效数字。",
+      msg: "大小减半，准确率不变。但普通电脑的 CPU 不擅长算 16 位小数，反而变慢了；在支持 16 位的显卡上会更快。" },
+    { k: "8 位整数（校准量化）", size: 2.7, ms: 2.1, acc: 82.67, f: q8, fmt: 6,
+      how: "先找出参数的范围（最大绝对值 0.1425），把它平均分成 255 份，每个参数只记它落在第几份（-127～127 的整数）。还要用 64 张训练照片“校准”每一层输出的范围。",
+      msg: "只有原来的三分之一大，准确率一点没掉。在编者电脑的 CPU 上没有变快；在手机、带 AI 加速的芯片（NPU）上，8 位整数模型通常快好几倍、也更省电。" },
+    { k: "8 位整数（不校准）", size: 2.4, ms: 8.4, acc: 78.0, f: q8, fmt: 6,
+      how: "参数同样压成 8 位整数，但不做校准，每次运行时临时估计每层输出的范围（动态量化）。",
+      msg: "文件最小，但准确率掉了将近 5 个百分点，速度也变慢了。这种简单的量化方式更适合全连接层多的模型，卷积网络最好用校准量化。" }
+  ];
+  function f16(v) { if (v === 0) return 0; var e = Math.floor(Math.log2(Math.abs(v))), s = Math.pow(2, e - 10); return Math.round(v / s) * s; }
+  function q8(v) { var sc = MAXABS / 127; return Math.round(v / sc) * sc; }
+  function show(i) {
+    var o = OPT[i];
+    Array.prototype.forEach.call(document.querySelectorAll("#btns button"), function (b, j) { b.classList.toggle("on", i === j); });
+    $("b1").style.width = (o.size / 8.9 * 100) + "%"; $("v1").textContent = o.size + " MB";
+    $("b2").style.width = (o.ms / 8.4 * 100) + "%"; $("v2").textContent = o.ms + " 毫秒";
+    $("b3").style.width = o.acc + "%"; $("v3").textContent = o.acc.toFixed(2) + "%";
+    var h = "<tr><th>原来的值</th>" + W.map(function (v) { return "<td>" + v.toFixed(8) + "</td>"; }).join("") + "</tr>";
+    h += "<tr><th>压缩后</th>" + W.map(function (v) { var q = o.f(v); return '<td class="' + (Math.abs(q - v) > 1e-9 ? "diff" : "") + '">' + q.toFixed(o.fmt) + "</td>"; }).join("") + "</tr>";
+    if (o.f === q8) h += "<tr><th>实际存的整数</th>" + W.map(function (v) { return "<td>" + Math.round(v / (MAXABS / 127)) + "</td>"; }).join("") + "</tr>";
+    $("tbl").innerHTML = h; $("how").textContent = o.how; $("msg").innerHTML = o.msg;
+  }
+  OPT.forEach(function (o, i) { var b = document.createElement("button"); b.textContent = o.k; b.onclick = function () { show(i); }; $("btns").appendChild(b); });
+  show(0);
+})();
+</script>
+</body>
+</html>

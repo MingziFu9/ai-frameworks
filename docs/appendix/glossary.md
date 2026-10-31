@@ -154,6 +154,10 @@ description: 本书主要术语的中英文名称、简明定义和例子，按�
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-部署"></span>部署 | Deployment | 把训练好的模型放到实际使用的环境中（网页、接口服务、手机、设备等），让用户能用上 | 把花卉识别模型发布成网页，店员用手机打开就能识别 |
+| <span id="g-Gradio"></span>Gradio | Gradio | 为机器学习模型快速生成网页的 Python 库，只需提供预测函数和输入、输出组件 | gr.Interface(fn=predict, inputs=gr.Image(), outputs=gr.Label()) |
+| <span id="g-ONNX"></span>ONNX | Open Neural Network Exchange | 开放的神经网络模型交换格式，各框架训练的模型都可转换成它，用 ONNX Runtime 运行而不需要原框架 | Keras 模型导出为 flowers.onnx，预测一张约 1 毫秒 |
+| <span id="g-量化"></span>量化 | Quantization | 用更少的位数（如 8 位整数代替 32 位小数）存储模型参数，使模型变小，在合适的硬件上更快 | 花卉模型量化后从 8.9 MB 变成 2.7 MB，准确率不变 |
 
 ## 第 12 章 国产 AI 生态、数据安全与综合项目
 

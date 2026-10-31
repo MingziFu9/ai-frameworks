@@ -1,0 +1,5 @@
+# 平台会按这个文件安装需要的库
+paddlepaddle
+gradio
+numpy
+pillow

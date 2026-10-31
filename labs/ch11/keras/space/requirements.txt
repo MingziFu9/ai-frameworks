@@ -1,0 +1,6 @@
+# 平台会按这个文件安装需要的库
+keras
+tensorflow-cpu
+gradio
+numpy
+pillow
