@@ -36,6 +36,18 @@ description: 本书主要术语的中英文名称、简明定义和例子，按�
 
 | 术语 | 英文 | 定义 | 例子 |
 |---|---|---|---|
+| <span id="g-预训练模型"></span>预训练模型 | Pretrained Model | 别人已经用大量数据训练好、可以直接下载使用的模型 | 在 ImageNet 上训练好的 MobileNetV2 |
+| <span id="g-ImageNet"></span>ImageNet | ImageNet | 一个有 1000 个类别、约 128 万张图片的大型图片数据集，很多图像模型都在它上面预训练 | 类别里有“雏菊”“花瓶”“蜜蜂” |
+| <span id="g-模型参数"></span>模型参数 | Model Parameter | 模型在训练中学到、保存在文件里的大量数字，决定模型怎样答题，也叫权重 | MobileNetV2 约有 350 万个参数 |
+| <span id="g-置信度"></span>置信度 | Confidence | 模型对某个答案有多大把握，用 0～1 或百分比表示 | “雏菊 79%”中的 79% |
+| <span id="g-Top-5"></span>Top-5 | Top-5 | 模型给出的把握最大的前 5 个答案 | 雏菊、蜜蜂、花瓶、花盆、尖桩篱栅 |
+| <span id="g-文字识别"></span>文字识别 | Optical Character Recognition, OCR | 让模型从图片里找出文字并把它变成可编辑文本的技术 | 拍一张小票，得到“合计 58 元” |
+| <span id="g-模型社区"></span>模型社区 | Model Hub | 集中发布、下载和在线体验各种模型的网站 | 魔搭社区、飞桨 AI Studio、Hugging Face |
+| <span id="g-参数"></span>参数 | Argument | 调用函数时写在括号里交给函数的值 | `print("你好")` 中的 "你好" |
+| <span id="g-关键字参数"></span>关键字参数 | Keyword Argument | 用“名字=值”形式写的参数，不用记顺序 | `top=5` |
+| <span id="g-字符串"></span>字符串 | String | 用引号括起来的一段文字 | `"roses_1.jpg"` |
+| <span id="g-列表"></span>列表 | List | 用方括号括起来、按顺序存放多个值的容器 | `["daisy_1.jpg", "roses_1.jpg"]` |
+| <span id="g-for-循环"></span>for 循环 | for Loop | 把列表中的每个元素依次取出来、对它做同样操作的写法 | `for name in photos:` 逐张识别照片 |
 
 ## 第 3 章 数据在框架里的样子
 

@@ -28,7 +28,7 @@
 | 章 | 正文字数 | 实验 | 课后练习<br>（可在线作答） | 术语 | 参考文献 | 交互动画 |
 |---|---|---|---|---|---|---|
 | [第 1 章](chapters/01-intro/index.md) | 0.6 万 | 3 | 20（16） | 18 | 8 | 1 |
-| [第 2 章](chapters/02-pretrained/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
+| [第 2 章](chapters/02-pretrained/index.md) | 0.6 万 | 3 | 20（16） | 12 | 8 | 1 |
 | [第 3 章](chapters/03-data/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
 | [第 4 章](chapters/04-build-network/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
 | [第 5 章](chapters/05-training/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
@@ -39,9 +39,9 @@
 | [第 10 章](chapters/10-speech-apps/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
 | [第 11 章](chapters/11-deploy/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
 | [第 12 章](chapters/12-ecosystem/index.md) | 0.1 万 | 3 | 5（3） | 0 | 1 | 0 |
-| **合计** | **1.4 万** | **36** | **75（49）** | **18** | **19** | **1** |
+| **合计** | **1.9 万** | **36** | **90（62）** | **30** | **26** | **2** |
 
-正文字数只统计汉字，不含代码和课后练习；单选、多选和判断题可以在网页上直接作答。配套学习资源：[交互动画](sims/index.md) 1 个 · [学习图谱](learning-graph/index.md) 2 个概念 · [常见问题](faq/index.md) 2 问 · [术语表](appendix/glossary.md) 18 条。
+正文字数只统计汉字，不含代码和课后练习；单选、多选和判断题可以在网页上直接作答。配套学习资源：[交互动画](sims/index.md) 2 个 · [学习图谱](learning-graph/index.md) 2 个概念 · [常见问题](faq/index.md) 2 问 · [术语表](appendix/glossary.md) 30 条。
 
 <!-- stats:end -->
 
@@ -51,7 +51,7 @@
 | 章节 | 实验 |
 |---|---|
 | [第 1 章 认识人工智能开发框架](chapters/01-intro/index.md) | 实验 1-1 ★ 打开云端 Notebook，运行第一段代码<br>实验 1-2 ★ 环境自检<br>实验 1-3 ☆ 在自己的电脑上安装框架 |
-| [第 2 章 第一次用框架：调用现成模型](chapters/02-pretrained/index.md) | 实验 2-1 ★ 实验名称<br>实验 2-2 ★ 实验名称<br>实验 2-3 ★ 实验名称 |
+| [第 2 章 第一次用框架：调用现成模型](chapters/02-pretrained/index.md) | 实验 2-1 ★ 让模型认出一张花的照片<br>实验 2-2 ★ 换图试试：认一批照片<br>实验 2-3 ☆ 一行代码体验文字识别 |
 | [第 3 章 数据在框架里的样子](chapters/03-data/index.md) | 实验 3-1 ★ 实验名称<br>实验 3-2 ★ 实验名称<br>实验 3-3 ★ 实验名称 |
 | [第 4 章 搭积木：构建神经网络](chapters/04-build-network/index.md) | 实验 4-1 ★ 实验名称<br>实验 4-2 ★ 实验名称<br>实验 4-3 ★ 实验名称 |
 | [第 5 章 训练模型：fit 背后发生了什么](chapters/05-training/index.md) | 实验 5-1 ★ 实验名称<br>实验 5-2 ★ 实验名称<br>实验 5-3 ★ 实验名称 |

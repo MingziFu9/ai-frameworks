@@ -6,3 +6,11 @@ __pycache__/
 .ipynb_checkpoints/
 build/
 node_modules/
+*.keras
+*.h5
+*.pdparams
+*.pdopt
+*.pdmodel
+*.onnx
+logs/
+runs/
