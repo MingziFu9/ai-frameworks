@@ -51,3 +51,57 @@ lesson_plan:
   online_ratio: 0.5
   teacher: ""
   school: ""
+
+# 首页“先玩一玩”轮播：按轮播顺序写，第 1 个放画面最震撼的。sim 是 docs/sims/ 下的目录名，hook 是一句问句，play 是一句玩法；
+# steps 是录短视频时自动做的操作（写法见 编写规范.md“首页轮播”）。改完运行 python tools/showcase.py record 重录视频。
+showcase_tagline: "调用、训练、部署：用框架把模型做成应用"
+showcase:
+  - sim: confidence-threshold
+    hook: "把门槛往下拉，照片里冒出更多“人”"
+    play: "门槛太高会漏检，太低会误报。"
+    steps:
+      - ["slide", "#th", 10, {"hold": 1}]
+      - ["slide", "#th", 80, {"sec": 1.6, "hold": 1}]
+      - ["slide", "#th", 40, {"hold": 0.6}]
+      - ["poster"]
+      - ["click", "运河街景", {"hold": 0.6}]
+      - ["slide", "#th", 15, {"hold": 1}]
+  - sim: model-top5
+    hook: "点一张花的照片，看模型的前 5 个猜测"
+    play: "预训练模型认识 1000 种东西。"
+    vw: 860
+    steps:
+      - ["click", "img >> nth=2", {"hold": 1}]
+      - ["click", "img >> nth=5", {"hold": 1}]
+      - ["poster"]
+      - ["click", "img >> nth=8", {"hold": 1}]
+      - ["click", "img >> nth=9", {"hold": 1}]
+  - sim: augment-preview
+    hook: "一张郁金香，翻一翻、转一转，变出 8 张训练图"
+    play: "拖动旋转和亮度，看“新”图片长什么样。"
+    steps:
+      - ["click", "再随机一次", {"n": 3, "gap": 0.7, "hold": 0.8}]
+      - ["click", "试试“过头”的设置", {"hold": 1.2}]
+      - ["poster"]
+      - ["click", "玫瑰", {"hold": 0.6}]
+      - ["click", "再随机一次", {"hold": 1}]
+  - sim: hear-sound
+    hook: "把“yes”和“no”画成图，模型就能听懂"
+    play: "播放录音，同时看波形和声谱图。"
+    steps:
+      - ["click", "no", {"hold": 1}]
+      - ["click", "up", {"hold": 1}]
+      - ["click", "down", {"hold": 1}]
+      - ["click", "哆咪嗦（编者合成）", {"hold": 1.2}]
+      - ["poster"]
+      - ["click", "yes", {"hold": 1}]
+  - sim: cpu-gpu-race
+    hook: "4 个大核对 1000 个小核，谁先算完？"
+    play: "调大计算量，差距一下子拉开。"
+    vw: 860
+    steps:
+      - ["click", "很多（约 63 万道题）", {"hold": 0.5}]
+      - ["click", "开始比赛", {"hold": 3}]
+      - ["poster"]
+      - ["click", "很少（100 道题）", {"hold": 0.4}]
+      - ["click", "开始比赛", {"hold": 2}]

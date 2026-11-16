@@ -9,6 +9,22 @@
     4 学分 · 72 学时（理论 60 学时 + 实验 12 学时） · 第 4 学期 · 12 章 · 36 个实验 · 期末开卷
 <!-- course:end -->
 
+<!-- showcase:start -->
+## 先玩一玩
+
+<p class="sc-tagline">调用、训练、部署：用框架把模型做成应用</p>
+
+<div class="showcase" aria-label="精选交互动画">
+<ol class="sc-list">
+<li data-sim="sims/confidence-threshold/main.html" data-video="assets/showcase/confidence-threshold" data-title="置信度门槛" data-play="门槛太高会漏检，太低会误报。"><img src="assets/showcase/confidence-threshold.jpg" alt="置信度门槛截图" loading="lazy"><p class="sc-hook">把门槛往下拉，照片里冒出更多“人”</p><p><b>置信度门槛</b>　门槛太高会漏检，太低会误报。</p><p><a href="sims/confidence-threshold/main.html">打开动画</a>　<a class="sc-chap" href="chapters/08-image-apps/" title="第 8 章 图像应用：检测与文字识别">去读第8章 →</a></p></li>
+<li data-sim="sims/model-top5/main.html" data-video="assets/showcase/model-top5" data-title="模型是怎样“看”图的" data-play="预训练模型认识 1000 种东西。"><img src="assets/showcase/model-top5.jpg" alt="模型是怎样“看”图的截图" loading="lazy"><p class="sc-hook">点一张花的照片，看模型的前 5 个猜测</p><p><b>模型是怎样“看”图的</b>　预训练模型认识 1000 种东西。</p><p><a href="sims/model-top5/main.html">打开动画</a>　<a class="sc-chap" href="chapters/02-pretrained/" title="第 2 章 第一次用框架：调用现成模型">去读第2章 →</a></p></li>
+<li data-sim="sims/augment-preview/main.html" data-video="assets/showcase/augment-preview" data-title="数据增强预览" data-play="拖动旋转和亮度，看“新”图片长什么样。"><img src="assets/showcase/augment-preview.jpg" alt="数据增强预览截图" loading="lazy"><p class="sc-hook">一张郁金香，翻一翻、转一转，变出 8 张训练图</p><p><b>数据增强预览</b>　拖动旋转和亮度，看“新”图片长什么样。</p><p><a href="sims/augment-preview/main.html">打开动画</a>　<a class="sc-chap" href="chapters/03-data/" title="第 3 章 数据在框架里的样子">去读第3章 →</a></p></li>
+<li data-sim="sims/hear-sound/main.html" data-video="assets/showcase/hear-sound" data-title="看见声音" data-play="播放录音，同时看波形和声谱图。"><img src="assets/showcase/hear-sound.jpg" alt="看见声音截图" loading="lazy"><p class="sc-hook">把“yes”和“no”画成图，模型就能听懂</p><p><b>看见声音</b>　播放录音，同时看波形和声谱图。</p><p><a href="sims/hear-sound/main.html">打开动画</a>　<a class="sc-chap" href="chapters/10-speech-apps/" title="第 10 章 语音应用：让模型听懂声音">去读第10章 →</a></p></li>
+<li data-sim="sims/cpu-gpu-race/main.html" data-video="assets/showcase/cpu-gpu-race" data-title="CPU 与 GPU 谁算得快" data-play="调大计算量，差距一下子拉开。"><img src="assets/showcase/cpu-gpu-race.jpg" alt="CPU 与 GPU 谁算得快截图" loading="lazy"><p class="sc-hook">4 个大核对 1000 个小核，谁先算完？</p><p><b>CPU 与 GPU 谁算得快</b>　调大计算量，差距一下子拉开。</p><p><a href="sims/cpu-gpu-race/main.html">打开动画</a>　<a class="sc-chap" href="chapters/01-intro/" title="第 1 章 认识人工智能开发框架">去读第1章 →</a></p></li>
+</ol>
+</div>
+<!-- showcase:end -->
+
 ## 这本书讲什么
 
 手机拍照识花、外卖评论自动分好评差评、对着音箱说一句话它就照做，这些人工智能应用背后，都是用 Keras、PyTorch、飞桨、昇思这类**开发框架**做出来的。开发框架就是做人工智能的“工具箱”：准备数据、搭网络、训练、评估、做成应用，每一步都有现成的工具。
